@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class Solution {
     public ListNode middleNode(ListNode head) {
         /*876. 链表的中间节点*/
@@ -118,6 +121,162 @@ public class Solution {
             head2 = head2.next;
         }
         return max;
+    }
+
+    public void deleteNode(ListNode node) {
+        /*237. 删除链表中的节点
+         * 链表值唯一，保证所给的node不是最后一个节点，
+         * 这里的删除指给定节点的只不存在链表中
+         * */
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        /*19.删除链表的倒数第 N 个节点
+         * 给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+         * 思路：因为头节点可以被删除，引入dummy node 简化删除逻辑
+         * */
+        ListNode dummy = new ListNode(0, head);
+        ListNode right = dummy;
+        for (int i = 0; i < n; i++) {
+            right = right.next;
+        }
+        ListNode left = dummy;
+        while (right.next != null) {
+            left = left.next;
+            right = right.next;
+        }
+        left.next = left.next.next;
+        return dummy.next;
+    }
+
+    /*    public ListNode deleteDuplicates(ListNode head) {
+     *//*83.删除排序链表中的重复元素
+     * 给定一个已排序的链表的头 head ，
+     * 删除所有重复的元素，使每个元素只出现一次 。返回已排序的链表 。
+     * 思路：判断当前节点的值与下一个节点的值是否相同，
+     * 相同就删除下一个节点，直到不同时才移动当前节点
+     * *//*
+        if(head == null)
+            return head;
+        ListNode cur = head;
+        while (cur.next != null) {
+            if (cur.val == cur.next.val) {
+                cur.next = cur.next.next;
+            } else cur = cur.next;
+        }
+        return head;
+    }*/
+    public ListNode deleteDuplicates(ListNode head) {
+        /*82.删除排序链表中的重复元素
+         *  给定一个已排序的链表的头 head ，
+         * 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回已排序的链表 。
+         * 思路：这题不同的是，只要有重复数字出现，全部删除，可能删除到头节点
+         * 引入 dummy node，同时当有重复值出现时，需要循环删除
+         * */
+        if (head == null) {
+            return head;
+        }
+        ListNode dummy = new ListNode(0, head);
+        ListNode cur = dummy;
+        // 循环内要用到next,next.next 所以两个都要判断
+        while (cur.next != null && cur.next.next != null) {
+            int val = cur.next.next.val;
+            if (cur.next.val == val) {
+                while (cur.next != null && cur.next.val == val) {
+                    cur.next = cur.next.next;
+                }
+            } else cur = cur.next;
+        }
+        return dummy.next;
+
+    }
+
+    public ListNode removeElements(ListNode head, int val) {
+        /*203.移除链表元素
+         * 给你一个链表的头节点 head 和一个整数 val ，
+         * 请你删除链表中所有满足 Node.val == val 的节点，并返回新的头节点 。
+         * 思路：有可能删除头节点，引入dummy node
+         * */
+        ListNode dummy = new ListNode(0, head);
+        ListNode cur = dummy;
+        while (cur.next != null) {
+            if (cur.next.val == val) {
+                cur.next = cur.next.next;
+            } else {
+                cur = cur.next;
+            }
+        }
+        return dummy.next;
+    }
+
+    public ListNode modifiedList(int[] nums, ListNode head) {
+        /*3217. 从链表中移除在数组中存在的节点
+         * 给你一个整数数组 nums 和一个链表的头节点 head。
+         * 从链表中移除所有存在于 nums 中的节点后，返回修改后的链表的头节点。
+         * 将 nums 中的元素存于 hashset，遍历链表时判断是否存在
+         * */
+        Set<Integer> set = new HashSet<>(nums.length);
+        for (int num : nums) {
+            set.add(num);
+        }
+        ListNode dummy = new ListNode(0, head);
+        ListNode cur = dummy;
+        while (cur.next != null) {
+            if (set.contains(cur.next.val)) {
+                cur.next = cur.next.next;
+            } else
+                cur = cur.next;
+        }
+        return dummy.next;
+    }
+
+    public ListNode removeNodes(ListNode head) {
+        /*2487.从链表中移除节点
+        * 给你一个链表的头节点 head 。
+        移除每个右侧有一个更大数值的节点。
+        返回修改后链表的头节点 head
+        * */
+        head = reverseList(head);
+        // 反转链表，现在是删除比当前节点值小的节点
+        ListNode cur = head;
+        while (cur.next != null) {
+            if (cur.val > cur.next.val) {
+                cur.next = cur.next.next;
+            } else {
+                cur = cur.next;
+            }
+        }
+        return reverseList(head);
+    }
+
+    public ListNode mergeInBetween(ListNode list1, int a, int b, ListNode list2) {
+        /*1669.合并两个链表
+         * 给你两个链表 list1 和 list2 ，它们包含的元素分别为 n 个和 m 个。
+         * 请你将 list1 中下标从 a 到 b 的全部节点都删除，并将list2 接在被删除节点的位置。
+         * 思路：有可能删除 list1 的头节点，dummy node
+         * 需要一个list2 的尾指针
+         * 需要一个指针定位插入位置
+         * */
+        ListNode dummy = new ListNode(0, list1);
+        ListNode tail2 = null;
+        ListNode cur = list2;
+        while (cur.next != null) {
+            cur = cur.next;
+        }
+        tail2 = cur;
+        cur = dummy;
+        for (int i = 0; i < a; i++) {
+            cur = cur.next;
+        }
+        for (int i = 0; i < (b - a + 1); i++) {
+            cur.next = cur.next.next;
+        }
+        tail2.next = cur.next;
+        cur.next = list2;
+        return dummy.next;
+
     }
 
 }
