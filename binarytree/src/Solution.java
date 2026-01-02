@@ -1,5 +1,7 @@
+import java.lang.annotation.Target;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.jar.JarEntry;
 
 public class Solution {
 
@@ -323,7 +325,7 @@ public class Solution {
             return left && right;
     }
 
-    private int max = 0;
+    //private int max = 0;
 
     public int[] findFrequentTreeSum(TreeNode root) {
         /*508. 出现次数最多的子树元素和
@@ -354,7 +356,7 @@ public class Solution {
         return sum;
     }
 
-    private int ans;
+    //private int ans;
 
     public int maxAncestorDiff(TreeNode root) {
         /*1026.节点与其祖先之间的最大差值
@@ -421,6 +423,153 @@ public class Solution {
 
         return root.left == null && root.right == null ? null : root;
 
+    }
+
+    //private Long pre = Long.MIN_VALUE;
+
+    public boolean isValidBST(TreeNode root) {
+        /*98. 验证二叉搜索树
+         * 先序、中序、后序遍历分别验证二叉搜索树
+         * 先序：思路对于当前节点它的值要满足：大于最小值，小于最大值，并且左右子树都要满足，向下递的时候更改最值
+         * 中序：严格递增，当前节点要大于之前节点的值
+         * 后序：判断当前节点值是否大于左子树归上来的最大值，是否小于右子树归上来的最小值，
+         * 再递归判断左右子树:抓住关键点当前节点值不在左右子树归上来的访问内，抓住这个点了就好写边界条件了
+         * */
+        return f(root)[1] != Long.MAX_VALUE;
+
+    }
+
+    private long[] f(TreeNode root) {
+        if (root == null)
+            return new long[]{Long.MAX_VALUE, Long.MIN_VALUE};
+        long[] left = f(root.left);
+        long[] right = f(root.right);
+        long val = root.val;
+        if (val > left[1] && val < right[0]) {
+            //当前节点符合要求
+            return new long[]{Math.min(val, left[0]), Math.max(val, right[1])};
+        }
+        //不符合要求
+        return new long[]{Long.MIN_VALUE, Long.MAX_VALUE};
+    }
+
+    public TreeNode searchBST(TreeNode root, int val) {
+        /*700.二叉搜索树中的搜索
+        * 给定二叉搜索树（BST）的根节点 root 和一个整数值 val。
+          你需要在 BST 中找到节点值等于 val 的节点。
+          * 返回以该节点为根的子树。 如果节点不存在，则返回 null 。
+        * */
+        if (root == null)
+            return null;
+
+        TreeNode left = searchBST(root.left, val);
+        if (left != null && left.val == val)
+            return left;
+
+        TreeNode right = searchBST(root.right, val);
+        if (right != null && right.val == val)
+            return right;
+
+        return root.val == val ? root : null;
+
+    }
+
+    public int rangeSumBST(TreeNode root, int low, int high) {
+        /*938.二叉搜索树的范围和
+         * 给定二叉搜索树的根结点 root，返回值位于范围 [low, high] 之间的所有结点的值的和。
+         * */
+        if (root == null) {
+            return 0;
+        }
+        if (root.val < low) {
+            return rangeSumBST(root.right, low, high);
+        } else if (root.val > high)
+            return rangeSumBST(root.left, low, high);
+        return rangeSumBST(root.left, low, high) + rangeSumBST(root.right, low, high) + root.val;
+
+
+    }
+
+//    private int ans = Integer.MAX_VALUE;
+//    private int pre = Integer.MIN_VALUE / 2;
+
+    public int getMinimumDifference(TreeNode root) {
+        /*530.二叉搜索树的最小绝对差
+         * 给你一个二叉搜索树的根节点 root ，返回 树中任意两不同节点值之间的最小差值 。
+         * 差值是一个正数，其数值等于两值之差的绝对值。
+         * 思路：中序遍历：得到严格递增的数组
+         * 答案只能产生在相邻数组元素之中
+         * 进阶：再遍历的时候就更新答案
+         * */
+        dfs(root);
+        return ans;
+    }
+
+    private void dfs(TreeNode root) {
+        if (root == null)
+            return;
+        dfs(root.left);
+        ans = Math.min(ans, root.val - pre);
+        pre = root.val;
+        dfs(root.right);
+    }
+
+    private int pre = Integer.MIN_VALUE;
+    private int max = Integer.MIN_VALUE;
+
+    public List<List<Integer>> closestNodes(TreeNode root, List<Integer> queries) {
+        /*2476.二叉搜索树最近节点查询
+        * 给你一个 二叉搜索树 的根节点 root ，和一个由正整数组成、长度为 n 的数组 queries 。
+        * 请你找出一个长度为 n 的 二维 答案数组 answer ，其中 answer[i] = [mini, maxi] ：
+        * mini 是树中小于等于 queries[i] 的 最大值 。如果不存在这样的值，则使用 -1 代替。
+          maxi 是树中大于等于 queries[i] 的 最小值 。如果不存在这样的值，则使用 -1 代替。
+          * 思路：先把他排成有序数组，然后用二分查找搜索目标值
+          * 进阶：在中序遍历时来找答案。
+            思路：中序遍历树，记录当前节点的前一个值，满足 前一个值 < query < 当前节点，就是答案
+        * */
+
+        List<Integer> list = new ArrayList<>();
+        dfs(root, list);
+        int len = list.size();
+        int[] sortArray = new int[len];
+        for (int i = 0; i < len; i++) {
+            sortArray[i] = list.get(i);
+        }
+        List<List<Integer>> ans = new ArrayList<>(queries.size());
+        for (int query : queries) {
+            int idx = binarySearch(sortArray, query);
+            int min = idx == -1 ? -1 : sortArray[idx];
+            if (idx == -1 || sortArray[idx] != query) {
+                idx++;
+            }
+            int max = idx > len ? -1 : sortArray[idx];
+            ans.add(List.of(min,max));
+        }
+        return ans;
+
+    }
+
+
+    private int binarySearch(int[] sortArray, int target) {
+        int left = -1;
+        int right = sortArray.length;
+        while (left + 1 < right) {
+            // 开区间
+            int mid = (left + right) >>> 1;
+            if (sortArray[mid] <= target) {
+                left = mid;
+            } else
+                right = mid;
+        }
+        return left;
+    }
+
+    private void dfs(TreeNode root, List<Integer> list) {
+        if (root == null)
+            return;
+        dfs(root.left, list);
+        list.add(root.val);
+        dfs(root.right, list);
     }
 
 
