@@ -1,4 +1,6 @@
 import java.lang.annotation.Target;
+import java.nio.channels.NonReadableChannelException;
+import java.security.cert.PKIXCertPathBuilderResult;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.jar.JarEntry;
@@ -347,14 +349,14 @@ public class Solution {
         return ans;
     }
 
-    private int dfs(TreeNode node, Map<Integer, Integer> map) {
-        if (node == null)
-            return 0;
-        int sum = node.val + dfs(node.left, map) + dfs(node.right, map);
-        map.merge(sum, 1, Integer::sum);
-        max = Math.max(max, map.get(sum));
-        return sum;
-    }
+//    private int dfs(TreeNode node, Map<Integer, Integer> map) {
+//        if (node == null)
+//            return 0;
+//        int sum = node.val + dfs(node.left, map) + dfs(node.right, map);
+//        map.merge(sum, 1, Integer::sum);
+//        max = Math.max(max, map.get(sum));
+//        return sum;
+//    }
 
     //private int ans;
 
@@ -505,17 +507,17 @@ public class Solution {
         return ans;
     }
 
-    private void dfs(TreeNode root) {
-        if (root == null)
-            return;
-        dfs(root.left);
-        ans = Math.min(ans, root.val - pre);
-        pre = root.val;
-        dfs(root.right);
-    }
+//    private void dfs(TreeNode root) {
+//        if (root == null)
+//            return;
+//        dfs(root.left);
+//        ans = Math.min(ans, root.val - pre);
+//        pre = root.val;
+//        dfs(root.right);
+//    }
 
-    private int pre = Integer.MIN_VALUE;
-    private int max = Integer.MIN_VALUE;
+//    private int pre = Integer.MIN_VALUE;
+//    private int max = Integer.MIN_VALUE;
 
     public List<List<Integer>> closestNodes(TreeNode root, List<Integer> queries) {
         /*2476.二叉搜索树最近节点查询
@@ -543,7 +545,7 @@ public class Solution {
                 idx++;
             }
             int max = idx > len ? -1 : sortArray[idx];
-            ans.add(List.of(min,max));
+            ans.add(List.of(min, max));
         }
         return ans;
 
@@ -564,12 +566,212 @@ public class Solution {
         return left;
     }
 
-    private void dfs(TreeNode root, List<Integer> list) {
-        if (root == null)
+//    private void dfs(TreeNode root, List<Integer> list) {
+//        if (root == null)
+//            return;
+//        dfs(root.left, list);
+//        list.add(root.val);
+//        dfs(root.right, list);
+//    }
+
+    private int maxCnt = 0;
+    //private int cnt = 0;
+//    private int pre = Integer.MIN_VALUE;
+
+    public int[] findMode(TreeNode root) {
+        /*501. 二叉搜索树中的众数
+        找出并返回 BST 中的所有众数，不止一个时可以任意顺序返回
+        * 思路：遍历节点时，对它进行计数，遍历结束后将次数最多的加入
+          进阶：不适用递归以外额外的空间
+          思路：没有利用到二叉搜索树的性质，根据中序遍历得到有序序列，众数一定是连续出现的
+          中序遍历时维护一个变量记录前一个节点的值，如果值相同，CNT++，不相同CNT重置为1
+          这样只能找到最高频率，怎么记录答案？
+          同时维护一个遍历到当前位置出现最多频率的 maxCnt，当 cnt == maxCnt 时记录答案
+          但是当 cnt > maxCnt 后要清空答案，同时更新 maxCnt
+        * */
+        Queue<Integer> stack = new LinkedList<>();
+        dfs(root, stack);
+        int[] ans = new int[stack.size()];
+        for (int i = 0; i < ans.length; i++) {
+            ans[i] = stack.poll();
+        }
+        return ans;
+    }
+
+    private void dfs(TreeNode node, Queue<Integer> stack) {
+        if (node == null)
             return;
-        dfs(root.left, list);
-        list.add(root.val);
-        dfs(root.right, list);
+        dfs(node.left, stack);
+        if (node.val == pre) {
+            cnt++;
+        } else {
+            cnt = 1;
+        }
+        if (cnt > maxCnt) {
+            maxCnt = cnt;
+            stack.clear();
+            stack.offer(node.val);
+        } else if (cnt == maxCnt) {
+            stack.offer(node.val);
+        }
+        pre = node.val;
+        dfs(node.right, stack);
+    }
+
+    private int cnt;
+    private int ans;
+
+    public int kthSmallest(TreeNode root, int k) {
+        /*230.二叉搜索树中第 k 小的元素
+         * 给定一个二叉搜索树的根节点 root ，
+         * 和一个整数 k ，找其中第 k 小的元素（k 从 1 开始计数）。
+         * */
+        cnt = k;
+        return dfs(root);
+    }
+
+    //    private int dfs(TreeNode node) {
+//
+//        if(node==null)
+//            return -1;
+//        int left= dfs(node.left);
+//        if(left !=-1)
+//            return left;
+//        if(--cnt == 0)
+//            return node.val;
+//        return dfs(node.right);
+//    }
+    private int maxSum = Integer.MIN_VALUE;
+
+    public int maxSumBST(TreeNode root) {
+        /*1373.二叉搜索子树的最大键值和
+         * root 是二叉树，找到其中的二叉搜索子树，并返回二叉搜索子树中的最大键值和
+         * 思路：判断左子树是否是二叉搜索树，右子树是否是二叉搜索树，如果都是，在判断当前树是否是二叉搜索树
+         * 同时还需要返回子树的最大键值和，这样看后序遍历似乎更好
+         * 注意：负数时，返回零，因为空的树是任意树的子树，也算二叉搜索树，其“最大和”为0
+         * */
+        dfs(root);
+        return Math.max(maxSum, 0);
+
+    }
+
+    private int[] dfs(TreeNode node) {
+        if (node == null)
+            return new int[]{Integer.MAX_VALUE, Integer.MIN_VALUE, 0};
+        int[] left = dfs(node.left);
+        int[] right = dfs(node.right);
+        int val = node.val;
+        int sum = left[2] + right[2] + val;
+        if (val > left[1] && val < right[0]) {
+            maxSum = Math.max(maxSum, sum);
+            return new int[]{Math.min(val, left[0]), Math.max(val, right[1]), sum};
+        }
+        return new int[]{Integer.MIN_VALUE, Integer.MAX_VALUE, sum};
+
+    }
+
+    //    public TreeNode buildTree(int[] preorder, int[] inorder) {
+//        /*105.从前序与中序序列构造二叉树
+//         *
+//         * */
+//        int n = preorder.length;
+//        Map<Integer, Integer> map = new HashMap<>(n);
+//        for (int i = 0; i < inorder.length; i++) {
+//            map.put(inorder[i], i);
+//        }
+//        return dfs(preorder, 0, n, 0, n, map);
+//    }
+//
+//    private TreeNode dfs(int[] preorder, int preL, int preR, int inL, int inR, Map<Integer, Integer> map) {
+//        if (preL == preR) {
+//            return null;
+//        }
+//        int leftLen = map.get(preorder[preL]) - inL;
+//        TreeNode left = dfs(preorder,preL+1,preL+1+leftLen,inL,inL+leftLen,map);
+//        TreeNode right = dfs(preorder,preL+1+leftLen,preR,inL+1+leftLen,inR,map);
+//        return new TreeNode(preorder[preL],left,right);
+//
+//    }
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        /*106.从中序与后序构造二叉树
+         *
+         * */
+        int n = inorder.length;
+        Map<Integer, Integer> map = new HashMap<>(n);
+        for (int i = 0; i < inorder.length; i++) {
+            map.put(inorder[i], i);
+        }
+        return dfs(postorder, 0, n, 0, n, map);
+    }
+
+//    private TreeNode dfs(int[] postorder, int posL, int posR, int inL, int inR, Map<Integer, Integer> map) {
+//        if (posL == posR)
+//            return null;
+//
+//        int leftLen = map.get(postorder[posR - 1]) - inL;
+//        TreeNode left = dfs(postorder, posL, posL + leftLen, inL, inL + leftLen, map);
+//        TreeNode right = dfs(postorder, posL + leftLen, posR - 1, inL + 1 + leftLen, inR, map);
+//        return new TreeNode(postorder[posR-1],left,right);
+//    }
+
+    public TreeNode constructFromPrePost(int[] preorder, int[] postorder) {
+        // 889.根据前序和后序构造二叉树，存在多个答案返回其中一个即可
+        int n = preorder.length;
+        int[] map = new int[n + 1];
+        for (int i = 0; i < n; i++) {
+            map[postorder[i]] = i;
+        }
+        return dfs(preorder, 0, 0, n, map);
+    }
+
+    private TreeNode dfs(int[] preorder, int posL, int preL, int preR, int[] map) {
+        if (preL == preR)
+            return null;
+        if (preL + 1 == preR) { // 叶子节点
+            return new TreeNode(preorder[preL]);
+        }
+
+        int leftLen = map[preorder[preL + 1]] - posL + 1;
+        TreeNode left = dfs(preorder, posL, preL + 1, preL + 1 + leftLen, map);
+        TreeNode right = dfs(preorder, posL + leftLen, preL + 1 + leftLen, preR, map);
+        return new TreeNode(preorder[preL], left, right);
+    }
+
+    public List<TreeNode> delNodes(TreeNode root, int[] to_delete) {
+        /*1110.删点成林
+        *给出二叉树的根节点 root，树上每个节点都有一个不同的值。
+        如果节点值在 to_delete 中出现，我们就把该节点从树上删去，最后得到一个森林（一些不相交的树构成的集合）。
+        返回森林中的每棵树。你可以按任意顺序组织答案。
+        * 思路：显然这道题后序遍历比较合适，先序如果删了当前节点，左右子树找不到了，中序右子树找不到了
+        * 后序遍历：左右子树都删除完成后，判断当前节点是否需要删除，是的话，将左右加入答案
+        * */
+        int length = to_delete.length;
+        Set<Integer> set = new HashSet<>(length);
+        List<TreeNode> ans = new ArrayList<>();
+        for (int i : to_delete) {
+            set.add(i);
+        }
+
+        root = dfs(root, set, ans);
+        if (root != null)
+            ans.add(root);
+        return ans;
+    }
+
+    private TreeNode dfs(TreeNode node, Set<Integer> map, List<TreeNode> ans) {
+        if (node == null)
+            return null;
+        node.left = dfs(node.left, map, ans);
+        node.right = dfs(node.right, map, ans);
+        if (!map.contains(node.val)) {
+            return node;
+        }
+        if (node.left != null)
+            ans.add(node.left);
+        if (node.right != null)
+            ans.add(node.right);
+        return null;
+
     }
 
 
