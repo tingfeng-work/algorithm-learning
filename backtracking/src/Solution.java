@@ -1,3 +1,5 @@
+import com.sun.jdi.Value;
+
 import java.util.*;
 
 class Solution {
@@ -17,7 +19,7 @@ class Solution {
         List<String> map = List.of("", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz");
         List<String> ans = new ArrayList<>();
         char[] path = new char[n];
-        dfs(0, n, ans, path, digits, map);
+//        dfs(0, n, ans, path, digits, map);
         return ans;
     }
 
@@ -225,4 +227,345 @@ class Solution {
             dfs(i + 1, chars, ans, path);
         }
     }
+
+    //    private int max = -1;
+//    private int path = 0;
+
+    public int perfectMenu(int[] materials, int[][] cookbooks, int[][] attribute, int limit) {
+        /*LCP 51.烹饪料理
+         * 勇者背包内共有编号为 0 ~ 4 的五种食材，其中 materials[j] 表示第 j 种食材的数量。
+         * 通过这些食材可以制作若干料理，cookbooks[i][j] 表示制作第 i 种料理需要第 j 种食材的数量，
+         * 而 attribute[i] = [x,y] 表示第 i 道料理的美味度 x 和饱腹感 y。
+         * 在饱腹感不小于 limit 的情况下，请返回勇者可获得的最大美味度。如果无法满足饱腹感要求，则返回 -1。
+         * 注意：每种料理只能制作一次。
+         * materials = [3,2,4,1,2] cookbooks = [[1,1,0,1,2],[2,1,4,0,0],[3,2,4,1,0]]
+         * attribute = [[3,2],[2,4],[7,6]] limit = 5
+         * 思路：回溯思想题解套路：枚举第 i 种料理选不选，选的话要能选，边界limit<=0且记录最大美味度
+         * */
+        // 输入的角度选与不选
+        //dfs(0, materials, cookbooks, attribute, limit, 0);
+
+        // 答案视角选哪个
+        //   dfs(0, materials, cookbooks, attribute, limit);
+        return max;
+    }
+
+    // 答案视角选哪个，每一个节点都有可能 limit<=0
+    // 下标大于等于i的都可以选做答案
+    // materials = [10,10,10,10,10] cookbooks = [[1,1,1,1,1],[3,3,3,3,3],[10,10,10,10,10]]
+    // attribute = [[5,5],[6,6],[10,10]] limit = 1
+//    private void dfs(int i, int[] materials, int[][] cookbooks, int[][] attribute, int limit) {
+//        if (limit <= 0) {
+//            max = Math.max(path, max);
+//        }
+//        if (i == cookbooks.length) return;
+//        for (int j = i; j < cookbooks.length; j++) {
+//            if (isAbleCook(j, materials, cookbooks)) {
+//                for (int k = 0; k < materials.length; k++) {
+//                    materials[k] -= cookbooks[j][k];
+//                }
+//                path = path + attribute[j][0];
+//                dfs(j + 1, materials, cookbooks, attribute, limit - attribute[j][1]);
+//                path = path - attribute[j][0];
+//                for (int k = 0; k < materials.length; k++) {
+//                    materials[k] += cookbooks[j][k];
+//                }
+//            }
+//        }
+//    }
+
+    // 选与不选的实现：枚举到第 i 种料理做不做
+    // materials = [10,10,10,10,10] cookbooks = [[1,1,1,1,1],[3,3,3,3,3],[10,10,10,10,10]]
+    // attribute = [[5,5],[6,6],[10,10]] limit = 1
+//    private void dfs(int i, int[] materials, int[][] cookbooks, int[][] attribute, int limit, int path) {
+//        if (i == cookbooks.length) {
+//            // 所有料理枚举完成，记录答案
+//            if (limit <= 0) {
+//                // path 表示遍历过程中，产生的美味度
+//                max = Math.max(path, max);
+//            }
+//            return;
+//        }
+//        // 不选
+//        dfs(i + 1, materials, cookbooks, attribute, limit, path);
+//
+//        // 选:还要看能不能选
+//        if (isAbleCook(i, materials, cookbooks)) {
+//            for (int j = 0; j < materials.length; j++) {
+//                materials[j] -= cookbooks[i][j];
+//            }
+//            dfs(i + 1, materials, cookbooks, attribute, limit - attribute[i][1], path = path + attribute[i][0]);
+//            for (int j = 0; j < materials.length; j++) {
+//                materials[j] += cookbooks[i][j];
+//            }
+//        }
+//    }
+
+    private boolean isAbleCook(int i, int[] materials, int[][] cookbooks) {
+        for (int j = 0; j < materials.length; j++) {
+            if (materials[j] < cookbooks[i][j]) return false;
+        }
+        return true;
+    }
+
+    //  private int max = 0;
+
+    public int maximumRows(int[][] matrix, int numSelect) {
+        /*2397.被列覆盖的最多行数
+         *一个 m x n 的二进制矩阵，numSelect 表示从矩阵中选择的列数，要求选择出的列使集合覆盖的行数最大
+         * 覆盖指的是：如果矩阵一行中含 1 的列都被选择了，则这一行被覆盖了
+         * 对于每一列有选或者不选，枚举第 i 列，path 路径记录选择的列。
+         * 枚举完后，判断当前选择的列能够使集合覆盖的行数
+         * 全局维护最大值
+         * */
+        int m = matrix.length;
+        if (m == 0) return 0;
+        int n = matrix[0].length;
+        // path[i] 表示第 i 列选不选，1表示选
+        boolean[] path = new boolean[n];
+
+        dfs(0, path, matrix, numSelect);
+        return max;
+    }
+
+    private void dfs(int i, boolean[] path, int[][] matrix, int numSelect) {
+        if (i == matrix[0].length) {
+            // 全部列枚举完成，计算答案
+            max = Math.max(max, coverRow(path, matrix));
+            return;
+        }
+        // 不选第 i 列
+        if (matrix[0].length - i > numSelect)
+            dfs(i + 1, path, matrix, numSelect);
+
+        // 选第 i 列
+        if (numSelect > 0) {
+            path[i] = true;
+            dfs(i + 1, path, matrix, --numSelect);
+            path[i] = false;
+        }
+    }
+
+    private int coverRow(boolean[] path, int[][] matrix) {
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int ans = m;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == 1 && !path[j]) {
+                    ans--;
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+
+    private int max = 0;
+
+    public int maxLength(List<String> arr) {
+        /*1239.串联字符串的最大长度
+         * 给定一个字符串数组 arr，
+         * 对于每一个元素有选或者不选来构成满足没有重复字母的字符串 s
+         * 返回s的最大长度
+         * 枚举第 i 个字符串，有选或不选
+         * 选的话要满足已经选的字符串与当前字符串没有重复字母
+         * 枚举完后，统计 s 的长度
+         * 维护全局变量记录 S 的长度
+         * */
+        // path 记录已经选择的字符串构成的字符串
+        boolean[] path = new boolean[26];
+        dfs(0, arr, path);
+        return max;
+    }
+
+    private void dfs(int i, List<String> arr, boolean[] path) {
+        if (i == arr.size()) {
+            // 枚举完毕
+            max = Math.max(max, count(path));
+            return;
+        }
+
+        // 不选
+        dfs(i + 1, arr, path);
+
+        // 选
+        if (check(i, arr, path)) {
+            increase(i, arr, path);
+            dfs(i + 1, arr, path);
+            decrease(i, arr, path);
+        }
+    }
+
+    private void decrease(int i, List<String> arr, boolean[] path) {
+        for (char c : arr.get(i).toCharArray()) {
+            path[c - 'a'] = false;
+        }
+    }
+
+    private void increase(int i, List<String> arr, boolean[] path) {
+        for (char c : arr.get(i).toCharArray()) {
+            path[c - 'a'] = true;
+        }
+    }
+
+    private boolean check(int i, List<String> arr, boolean[] path) {
+
+        char[] chars = arr.get(i).toCharArray();
+        boolean[] flag = new boolean[26];
+        for (char c : chars) {
+            if (path[c - 'a']) {
+                return false;
+            }
+            if (flag[c - 'a']) return false;
+            else flag[c - 'a'] = true;
+        }
+        return true;
+    }
+
+    private int count(boolean[] path) {
+        int ans = 0;
+        for (boolean b : path) {
+            if (b) ans++;
+        }
+        return ans;
+    }
+
+    private int score = 0;
+    private int[] ans = new int[12];
+
+    public int[] maximumBobPoints(int numArrows, int[] aliceArrows) {
+        int[] path = new int[12];
+        dfs(0, numArrows, aliceArrows, path);
+        return ans;
+    }
+
+    private void dfs(int i, int numArrows, int[] aliceArrows, int[] path) {
+        if (i == aliceArrows.length) {
+            // 所有得分区间都枚举完毕
+            // 计算得分
+            int nowScore = 0;
+            for (int j = 0; j < path.length; j++) {
+                if (path[j] > 0) {
+                    nowScore = nowScore + j;
+                }
+            }
+            if (nowScore > score) {
+                score = nowScore;
+                ans = Arrays.copyOf(path, 12);
+                if (numArrows > 0)
+                    ans[0] += numArrows;
+            }
+
+            return;
+        }
+        // 不选当前得分
+        dfs(i + 1, numArrows, aliceArrows, path);
+
+        // 选当前得分
+        if (numArrows > aliceArrows[i]) {
+            path[i] = aliceArrows[i] + 1;
+            dfs(i + 1, numArrows - aliceArrows[i] - 1, aliceArrows, path);
+            path[i] = 0;
+        }
+    }
+
+    boolean flag = false;
+
+    public int punishmentNumber(int n) {
+        /*2698.求一个整数的惩罚数
+         * 回溯判断 i 是否满足条件，也就是 i*i 能否分割为和为 i 的子字符串
+         * */
+        int ans = 0;
+        for (int i = 1; i <= n; i++) {
+            if (check(i)) {
+                ans += i * i;
+                flag = false;
+            }
+        }
+        return ans;
+    }
+
+
+    private boolean check(int i) {
+        int num = i * i;
+        String s = String.valueOf(num);
+        List<String> path = new ArrayList<>();
+        dfs(0, 0, s, i, path);
+        return flag;
+    }
+
+    // i 表示第 i 与 i+1 是否分割
+    private void dfs(int i, int start, String s, int target, List<String> path) {
+        if (flag)
+            return;
+        if (i == s.length()) {
+            // 枚举完了
+            int sum = 0;
+            for (String str : path) {
+                sum += Integer.parseInt(str);
+            }
+            if (sum == target)
+                flag = true;
+            return;
+        }
+        // 不分割
+        dfs(i + 1, start, s, target, path);
+
+        //分割
+        path.add(s.substring(start, i + 1));
+        dfs(i + 1, i + 1, s, target, path);
+        path.removeLast();
+    }
+
+    public List<String> restoreIpAddresses(String s) {
+        /*93.复原 IP 地址
+         * 一共只能加3个点，枚举第i个加点的位置*/
+        List<String> ans = new ArrayList<>();
+        List<String> path = new ArrayList<>();
+        f(0, 0, s, path, ans);
+        return ans;
+    }
+
+    // 枚举第 i 个点加在字符串的位置
+    private void f(int i, int start, String s, List<String> path, List<String> ans) {
+        if (i == 4) {
+            ans.add(String.join(".", path));
+            return;
+        }
+        for (int j = start; j < s.length() - 2; j++) {
+            String str;
+            if (i < 3) {
+                str = s.substring(start, j + 1);
+                if (check(str)) {
+                    path.add(str);
+                    f(i + 1, j + 1, s, path, ans);
+                    path.removeLast();
+                } else break;
+            } else {
+                str = s.substring(start);
+                if (check(str)) {
+                    path.add(str);
+                    f(i + 1, j + 1, s, path, ans);
+                    path.removeLast();
+                } else break;
+                break;
+            }
+
+        }
+
+    }
+
+    private boolean check(String str) {
+        if (str.length() > 1) {
+            if (str.startsWith("0"))
+                return false;
+            if (Long.parseLong(str) > 255)
+                return false;
+        }
+        return true;
+    }
+
+
 }
+
