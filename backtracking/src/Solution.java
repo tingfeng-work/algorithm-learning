@@ -59,19 +59,19 @@ class Solution {
     }
 
     // 从输入的角度枚举每个元素选与不选,叶子节点添加答案
-    private void dfs(int i, int[] nums, List<Integer> path, List<List<Integer>> ans) {
-        if (i == nums.length) {
-            ans.add(new ArrayList<>(path));
-            return;
-        }
-
-        //不选
-        dfs(i + 1, nums, path, ans);
-        // 选
-        path.add(nums[i]);
-        dfs(i + 1, nums, path, ans);
-        path.removeLast();
-    }
+//    private void dfs(int i, int[] nums, List<Integer> path, List<List<Integer>> ans) {
+//        if (i == nums.length) {
+//            ans.add(new ArrayList<>(path));
+//            return;
+//        }
+//
+//        //不选
+//        dfs(i + 1, nums, path, ans);
+//        // 选
+//        path.add(nums[i]);
+//        dfs(i + 1, nums, path, ans);
+//        path.removeLast();
+//    }
 
     // 当前答案选谁的实现
 //    private void dfs(int i, int[] nums, List<List<Integer>> ans, List<Integer> path) {
@@ -521,51 +521,275 @@ class Solution {
     public List<String> restoreIpAddresses(String s) {
         /*93.复原 IP 地址
          * 一共只能加3个点，枚举第i个加点的位置*/
+//        List<String> ans = new ArrayList<>();
+//        List<String> path = new ArrayList<>();
+//        f(0, 0, s, path, ans);
+//        return ans;
+        // 枚举答案选哪个，也就是枚举s[i]~s[n] 怎么分割
         List<String> ans = new ArrayList<>();
-        List<String> path = new ArrayList<>();
-        f(0, 0, s, path, ans);
+        String[] path = new String[s.length()];
+        dfs(0, 0, s, s.length(), path, ans);
         return ans;
     }
 
-    // 枚举第 i 个点加在字符串的位置
-    private void f(int i, int start, String s, List<String> path, List<String> ans) {
-        if (i == 4) {
-            ans.add(String.join(".", path));
+    private void dfs(int i, int count, String s, int len, String[] path, List<String> ans) {
+        // 剪枝: 还剩下 len - i个字符，段数 4 - count，每段至少一个字符，至多3个字符
+        if (len - i < 4 - count || len - i > (4 - count) * 3) {
             return;
         }
-        for (int j = start; j < s.length() - 2; j++) {
-            String str;
-            if (i < 3) {
-                str = s.substring(start, j + 1);
-                if (check(str)) {
-                    path.add(str);
-                    f(i + 1, j + 1, s, path, ans);
-                    path.removeLast();
-                } else break;
-            } else {
-                str = s.substring(start);
-                if (check(str)) {
-                    path.add(str);
-                    f(i + 1, j + 1, s, path, ans);
-                    path.removeLast();
-                } else break;
+        if (i == len) {
+            ans.add(String.join(".", path));
+        }
+        // 枚举选第 i 个
+        int value = 0;
+        for (int j = i; j < len; j++) {
+            value = value * 10 + (s.charAt(j) - '0');
+            if (value > 255)
                 break;
-            }
-
+            path[count] = s.substring(i, j + 1);
+            dfs(j + 1, count + 1, s, len, path, ans);
+            if (value == 0)
+                break;
         }
+    }
+
+    // 枚举第 i 个点加在字符串的位置
+//    private void f(int i, int start, String s, List<String> path, List<String> ans) {
+//        if (i == 4) {
+//            ans.add(String.join(".", path));
+//            return;
+//        }
+//        for (int j = start; j < s.length() - 2; j++) {
+//            String str;
+//            if (i < 3) {
+//                str = s.substring(start, j + 1);
+//                if (check(str)) {
+//                    path.add(str);
+//                    f(i + 1, j + 1, s, path, ans);
+//                    path.removeLast();
+//                } else break;
+//            } else {
+//                str = s.substring(start);
+//                if (check(str)) {
+//                    path.add(str);
+//                    f(i + 1, j + 1, s, path, ans);
+//                    path.removeLast();
+//                } else break;
+//                break;
+//            }
+//
+//        }
+//
+//    }
+//
+//    private boolean check(String str) {
+//        if (str.length() > 1) {
+//            if (str.startsWith("0"))
+//                return false;
+//            if (Long.parseLong(str) > 255)
+//                return false;
+//        }
+//        return true;
+//    }
+
+
+    public List<List<Integer>> combine(int n, int k) {
+        /*77.组合
+        * 给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
+          你可以按 任何顺序 返回答案。
+        * 从答案的角度：枚举答案集合中第 i 个数选哪个，同样[1,2] 与[2,1]为一个集合，可以规定顺序
+        * 剪枝：当答案集合长度等于k时，返回；当剩余元素个数小于k-答案元素个数时，返回
+        * */
+//        List<List<Integer>> ans = new ArrayList<>();
+//        List<Integer> path = new ArrayList<>();
+//        dfs(n, k, path, ans);
+//        return ans;
+        // 选不选的思路，枚举当前元素选不选
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        dfs(n, k, path, ans);
+        return ans;
+    }
+
+
+    //枚举第 i 个元素选不选
+ /*   private void dfs(int i, int k, List<Integer> path, List<List<Integer>> ans) {
+
+        int d = k - path.size();
+        if (d == 0) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+        if (d < i) {
+            // 不选
+            dfs(i - 1, k, path, ans);
+        }
+
+        // 选
+        path.add(i);
+        dfs(i - 1, k, path, ans);
+        path.removeLast();
+    }*/
+
+//    private void dfs(int n, int k, List<Integer> path, List<List<Integer>> ans) {
+//        int d = k - path.size();
+//        // 记录答案
+//        if (d == 0) {
+//            ans.add(new ArrayList<>(path));
+//            return;
+//        }
+//        // 剪枝
+//        // 枚举第 1、2、.... k 个答案元素选哪个
+//        for (int i = n; i >= d; i--) {
+//            path.add(i);
+//            dfs(i - 1, k, path, ans);
+//            path.removeLast();
+//        }
+//
+//
+//    }
+
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        /*216.组合总和 Ⅲ
+        * 找出所有相加之和为 n 的 k 个数的组合，且满足下列条件：
+        * 只使用数字1到9 每个数字最多使用一次
+          返回所有可能的有效组合的列表 。该列表不能包含相同的组合两次，组合可以以任何顺序返回。
+          枚举
+          * 答案选哪个
+          * 剪枝：当前和大于 n 时，直接返回
+          * n 大于 d 个最大的数的和时，直接返回
+
+        * */
+//        List<List<Integer>> ans = new ArrayList<>();
+//        List<Integer> path = new ArrayList<>();
+//        dfs(9, n, k, path, ans);
+//        return ans;
+        // 枚举选不选
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        dfs(9, n, k, path, ans);
+        return ans;
+    }
+
+    // 枚举选不选
+    private void dfs(int i, int target, int k, List<Integer> path, List<List<Integer>> ans) {
+        int d = k - path.size();
+        if (target < 0 | target > (2 * i + 1 - d) * d / 2)
+            return;
+        if (d == 0) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+
+        // 不选
+        if (i > d) {
+            dfs(i - 1, target, k, path, ans);
+        }
+
+        // 选
+        path.add(i);
+        dfs(i - 1, target - i, k, path, ans);
+        path.removeLast();
+    }
+
+//    private void dfs(int i, int target, int k, List<Integer> path, List<List<Integer>> ans) {
+//        int d = k - path.size();
+//        if (target < 0 | target > (2 * i + 1 - d) * d / 2)
+//            return;
+//        if (d == 0) {
+//            ans.add(new ArrayList<>(path));
+//            return;
+//        }
+//        for (int j = i; j >= d; j--) {
+//            path.add(j);
+//            dfs(j - 1, target - j, k, path, ans);
+//            path.removeLast();
+//        }
+//
+//    }
+
+    public List<String> generateParenthesis(int n) {
+        /*22.括号生成
+         * 数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+         * 思路：一共 2n 个括号，枚举第 i 个选不选，注意是有条件的选择：
+         * 左括号必须大于等于右括号的个数
+         * 左右括号数各自都需要小于n
+         * 左右括号数相等时，只能选左括号
+         * */
+        List<String> ans = new ArrayList<>();
+        char[] path = new char[n * 2];
+        dfs(0, 0, n, path, ans);
+        return ans;
+    }
+
+    private void dfs(int left, int right, int n, char[] path, List<String> ans) {
+        if (right == n) {
+            ans.add(new String(path));
+            return;
+        }
+        // 选左
+        if (left < n) {
+            path[left + right] = '(';
+            dfs(left, right + 1, n, path, ans);
+        }
+
+        // 选右
+        if (left > right) {
+            path[left + right] = ')';
+            dfs(left + 1, right, n, path, ans);
+        }
+    }
+
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        /*39.组合总和
+         * 无重复数组中找出和为 target 的不同组合，可以重复选取数组中的元素
+         * 2 <= candidates[i] <= 40
+         * 枚举答案选哪个，注意可以重复选择
+         * */
+        Arrays.sort(candidates);
+        List<List<Integer>> ans = new ArrayList<>(150);
+        List<Integer> path = new ArrayList<>();
+        dfs(0, target, candidates, path, ans);
+        return ans;
 
     }
 
-    private boolean check(String str) {
-        if (str.length() > 1) {
-            if (str.startsWith("0"))
-                return false;
-            if (Long.parseLong(str) > 255)
-                return false;
+    // 第 i 个元素选或者不选
+    private void dfs(int i, int target, int[] candidates, List<Integer> path, List<List<Integer>> ans) {
+        if (target == 0) {
+            ans.add(new ArrayList<>(path));
+            return;
         }
-        return true;
+        if (i == candidates.length || target < candidates[i])
+            return;
+        // 不选
+        dfs(i + 1, target, candidates, path, ans);
+
+        // 选
+        path.add(candidates[i]);
+        dfs(i, target - candidates[i], candidates, path, ans);
+        path.removeLast();
+
     }
 
+
+//    private void dfs(int i, int target, int[] candidates, List<Integer> path, List<List<Integer>> ans) {
+//        if (target < 0) {
+//            return;
+//        }
+//
+//        if (target == 0) {
+//            ans.add(new ArrayList<>(path));
+//            return;
+//        }
+//        // 枚举答案选哪个
+//        for (int j = i; j < candidates.length; j++) {
+//            path.add(candidates[j]);
+//            dfs(j, target - candidates[j], candidates, path, ans);
+//            path.removeLast();
+//        }
+//    }
 
 }
 
