@@ -432,7 +432,7 @@ class Solution {
     }
 
     private int score = 0;
-    private int[] ans = new int[12];
+    // private int[] ans = new int[12];
 
     public int[] maximumBobPoints(int numArrows, int[] aliceArrows) {
         int[] path = new int[12];
@@ -774,7 +774,7 @@ class Solution {
     }
 
 
-//    private void dfs(int i, int target, int[] candidates, List<Integer> path, List<List<Integer>> ans) {
+    //    private void dfs(int i, int target, int[] candidates, List<Integer> path, List<List<Integer>> ans) {
 //        if (target < 0) {
 //            return;
 //        }
@@ -790,6 +790,161 @@ class Solution {
 //            path.removeLast();
 //        }
 //    }
+    public List<List<Integer>> permute(int[] nums) {
+        /*46.全排列
+         * 给定一个不含重复数字的数组 nums ，返回其所有可能的全排列 。你可以按任意顺序返回答案。
+         * 思路：[1,2] 与 [2,1] 不同，也就是枚举选过还能选，怎么实现？
+         * 从元素选不选的角度不好实现：想象构造答案的搜索树，并不是每一个节点都有选或者不选两种情况，
+         * 存在大量特殊情况，例如选了 1，后面只能选2，没选1，后面只能选2然后选1。
+         * 从答案选哪个的角度好思考，需要维护一个数组，表示哪些元素能选，每次从能选的元素中选择一个元素
+         * */
+        int n = nums.length;
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> path = Arrays.asList(new Integer[n]);
+        boolean[] onPath = new boolean[n];
+        dfs(0, nums, onPath, path, ans);
+        return ans;
+    }
+
+    // 枚举选哪个
+    private void dfs(int i, int[] nums, boolean[] onPath, List<Integer> path, List<List<Integer>> ans) {
+        if (i == nums.length) {
+            ans.add(new ArrayList<>(path));
+            return;
+        }
+        // 枚举第 i 个答案选第 j 个元素
+        for (int j = 0; j < nums.length; j++) {
+            if (!onPath[j]) {
+                path.set(i, nums[j]);
+                onPath[j] = true;
+                dfs(i + 1, nums, onPath, path, ans);
+                onPath[j] = false;
+            }
+        }
+
+    }
+
+
+    public List<List<String>> solveNQueens(int n) {
+        /*51.N 皇后
+         * 将n个皇后放在 nxn 的棋盘上，要求：皇后之间不同行不同列
+         * 皇后不能位于同一斜线上
+         * 返回所有不同解决方案
+         * 每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
+         * 思路：复杂问题的拆分：
+         * 首先皇后位于不同行不同列，也就是每行每列只有一个皇后
+         * 等价与数组 col[i] 表示第 i 行的皇后位于第 col[i] 列的全排列
+         * 例如[1,3,0,2] 表示第 0 行的皇后在第1列，第 1行的皇后在第3列...
+         * 皇后不能位于同一斜线上：
+         * 等价于从上往下枚举，当前枚举到的行与列要放置皇后要求左上、右上方向上没有皇后
+         * 等价于行号-列号 = 当前行号 - 当前列号；行号+列号 = 当前行号+当前列号
+         * 将复杂问题的条件逐步拆分为熟悉的问题与解决方案，
+         * 首先书写全排列，再在全排列的基础上筛选不同斜线
+         *
+         * */
+
+        List<List<String>> ans = new ArrayList<>();
+        boolean[] col = new boolean[n];
+        int[] queens = new int[n];
+        boolean[] diag1 = new boolean[2 * n - 1];
+        boolean[] diag2 = new boolean[2 * n - 1];
+        dfs(0, queens, col, diag1, diag2, ans);
+        return ans;
+    }
+
+    private void dfs(int row, int[] queens, boolean[] col, boolean[] diag1, boolean[] diag2, List<List<String>> ans) {
+        int n = queens.length;
+        if (row == n) {
+            // 构造答案
+            List<String> path = new ArrayList<>(n);
+            for (int i : queens) {
+                char[] ansRow = new char[n];
+                Arrays.fill(ansRow, '.');
+                ansRow[i] = 'Q';
+                path.add(new String(ansRow));
+            }
+            ans.add(path);
+            return;
+        }
+        for (int c = 0; c < n; c++) {
+            int rc = row - c + n - 1;
+            if (!col[c] && !diag1[c + row] && !diag2[rc]) {
+                // 第 i 列没有被选过
+                // 合法
+                queens[row] = c;
+                col[c] = diag1[row + c] = diag2[rc] = true;
+                dfs(row + 1, queens, col, diag1, diag2, ans);
+                col[c] = diag1[row + c] = diag2[rc] = false;
+            }
+
+        }
+
+
+    }
+
+    //  private int ans = 0;
+
+    public int totalNQueens(int n) {
+        /*52.N 皇后Ⅱ
+         * 给你一个整数 n ，返回 n 皇后问题 不同的解决方案的数量
+         * */
+        boolean[] col = new boolean[n];
+        boolean[] diag1 = new boolean[n * 2 - 1];
+        boolean[] diag2 = new boolean[n * 2 - 1];
+        dfs(0, col, diag1, diag2);
+        return ans;
+    }
+
+    private void dfs(int row, boolean[] col, boolean[] diag1, boolean[] diag2) {
+        int n = col.length;
+        if (row == n) {
+            ans++;
+            return;
+        }
+        // [r,c] 放皇后
+        for (int c = 0; c < n; c++) {
+            int rc = row - c + n - 1;
+            if (!col[c] && !diag1[row + c] && !diag2[rc]) {
+                // 合法可以放皇后
+                col[c] = diag1[row + c] = diag2[rc] = true;
+                dfs(row + 1, col, diag1, diag2);
+                col[c] = diag1[row + c] = diag2[rc] = false;
+            }
+        }
+    }
+
+
+    public int countNumbersWithUniqueDigits(int n) {
+        /*357.统计各位数字都不同的数字个数
+         * 给你一个整数 n ，统计并返回各位数字都不同的数字 x 的个数，其中 0 <= x < 10^n 。
+         * 枚举当前答案选哪个
+         * */
+        if (n == 0) return 1;
+        boolean[] flag = new boolean[10];
+
+        return dfs(0, n, flag);
+    }
+
+    // 枚举第 i 个数选哪个
+    private int dfs(int i, int n, boolean[] flag) {
+        int count = 0;
+        if (i != n) {
+            // 第 i 个数选j
+            for (int j = 0; j < 10; j++) {
+                // 剪枝：多位数时，第一位不为0
+                if (j == 0 && n > 1 && i == 1) {
+                    continue;
+                }
+                // 不能用用过的数字
+                if (flag[j])
+                    continue;
+                flag[j] = true;
+                count = count + dfs(i + 1, n, flag) + 1;
+                flag[j] = false;
+            }
+        }
+        return count;
+    }
 
 }
 
