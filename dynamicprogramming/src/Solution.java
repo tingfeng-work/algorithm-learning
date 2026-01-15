@@ -858,4 +858,203 @@ class Solution {
 //        return cache[i][target] = res;
 //
 //    }
+    public int longestCommonSubsequence(String text1, String text2) {
+        /*1143.最长公共子序列
+         * 给定两个字符串 text1 和 text2，返回这两个字符串的最长公共子序列的长度。如果不存在公共子序列 ，返回 0
+         * 思路：回溯枚举当前字符 i,j 选或者不选；
+         * 子问题：前i、j个字符串的最长子序列。
+         * 下一个子问题：选了，不选
+         * */
+//        char[] chars1 = text1.toCharArray();
+//        char[] chars2 = text2.toCharArray();
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int[][] cache = new int[n][m];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(n - 1, m - 1, chars1, chars2, cache);
+
+        // 翻译为递推
+//        char[] chars1 = text1.toCharArray();
+//        char[] chars2 = text2.toCharArray();
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int[][] dp = new int[n + 1][m + 1];
+//        for (int i = 0; i < n; i++) {
+//            for (int j = 0; j < m; j++) {
+//                if (chars1[i] == chars2[j]) dp[i + 1][j + 1] = dp[i][j] + 1;
+//                else dp[i + 1][j + 1] = Math.max(dp[i][j + 1], dp[i + 1][j]);
+//            }
+//        }
+//        return dp[n][m];
+        // 进一步优化空间
+        char[] chars1 = text1.toCharArray();
+        char[] chars2 = text2.toCharArray();
+        int m = chars2.length;
+        int[] dp = new int[m + 1];
+        for (char c : chars1) {
+            int pre = 0;
+            for (int j = 0; j < m; j++) {
+                int temp = dp[j + 1];
+                if (c == chars2[j]) dp[j + 1] = pre + 1;
+                else dp[j + 1] = Math.max(dp[j + 1], dp[j]);
+                pre = temp;
+            }
+        }
+        return dp[m];
+    }
+
+    //    dfs(i,j) 表示前i个字符与前j个字符的最长公共子序列长度
+//    private int dfs(int i, int j, char[] chars1, char[] chars2, int[][] cache) {
+//        if (i < 0 || j < 0) {
+//            // 枚举到头了
+//            return 0;
+//        }
+//        if (cache[i][j] != -1)
+//            return cache[i][j];
+//
+//
+//        if (chars1[i] == chars2[j]) return cache[i][j] = dfs(i - 1, j - 1, chars1, chars2, cache) + 1;
+//
+//        return cache[i][j] = Math.max(dfs(i - 1, j, chars1, chars2, cache), dfs(i, j - 1, chars1, chars2, cache));
+//
+//    }
+//    private char[] chars1;
+//    private char[] chars2;
+
+//    public int minDistance(String word1, String word2) {
+//        /*72.编辑距离
+//         * 给你两个单词 word1 和 word2，请返回将 word1 转换成 word2 所使用的最少操作数。
+//         * 你可以对一个单词进行如下三种操作: 插入一个字符、删除一个字符、替换一个字符
+//         * 思路：倒序枚举每个单词 i、j，如果 i 和 j 相等，直接进入子问题
+//         * 如果 i ！= j，执行返回插入、删除、替换中较小值 +1
+//         * 插入操作等价于 dfs(i,j-1) 删除操作等价于 dfs(i-1,j) 替换操作等价于 dfs(i-1,j-1)
+//         * */
+////        chars1 = word1.toCharArray();
+////        chars2 = word2.toCharArray();
+////        int n = chars1.length;
+////        int m = chars2.length;
+////        int[][] cache = new int[n][m];
+////        for (int[] ints : cache) {
+////            Arrays.fill(ints, -1);
+////        }
+////        return dfs(n - 1, m - 1, cache);
+//        // 翻译为递推
+
+    /// /        char[] chars1 = word1.toCharArray();
+    /// /        char[] chars2 = word2.toCharArray();
+    /// /        int n = chars1.length;
+    /// /        int m = chars2.length;
+    /// /        int[][] dp = new int[n + 1][m+1];
+    /// /        for (int i = 0; i < m; i++) {
+    /// /            dp[0][i+1] = i + 1;
+    /// /        }
+    /// /
+    /// /        for (int i = 0; i < n; i++) {
+    /// /            dp[i+1][0] = i + 1;
+    /// /            for (int j = 0; j < m; j++) {
+    /// /                if (chars2[j] == chars1[i]) dp[i + 1][j+1] = dp[i][j];
+    /// /                else dp[i + 1][j+1] = Math.min(Math.min(dp[i + 1][j], dp[i][j+1]), dp[i][j]) + 1;
+    /// /            }
+    /// /        }
+    /// /        return dp[n][m];
+//        // 优化空间
+//        char[] chars1 = word1.toCharArray();
+//        char[] chars2 = word2.toCharArray();
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int[] dp = new int[m + 1];
+//        for (int j = 0; j < m; j++) {
+//            dp[j + 1] = j + 1;
+//        }
+//
+//        for (int i = 0; i < n; i++) {
+//            int pre = dp[0];
+//            dp[0] = i + 1;
+//            for (int j = 0; j < m; j++) {
+//                int temp = dp[j + 1];
+//                if (chars2[j] == chars1[i]) dp[j + 1] = pre;
+//                else dp[j + 1] = Math.min(Math.min(dp[j], dp[j + 1]), pre) + 1;
+//                pre = temp;
+//            }
+//        }
+//        return dp[m];
+//
+//    }
+
+    //    dfs(i,j) 表示将前i个字符转化为前 j 个字符的最少操作数
+//    private int dfs(int i, int j, int[][] cache) {
+//        if (i < 0) {
+//            // 表示word1字符比word2字符短，剩下的需要插入，短多少
+//            return j + 1;
+//        }
+//        if (j < 0) return i + 1;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        if (chars1[i] == chars2[j]) return cache[i][j] = dfs(i - 1, j - 1, cache);
+//
+//        return cache[i][j] = (Math.min(Math.min(dfs(i, j-1, cache), dfs(i - 1, j, cache)), dfs(i - 1, j - 1, cache)) + 1);
+//
+//    }
+//    private char[] s;
+//    private char[] t;
+//    private int[][] cache;
+    public int minDistance(String word1, String word2) {
+        /*583.两个字符串的删除操作
+         * 给定两个单词 word1 和 word2 ，返回使得 word1 和  word2 相同所需的最小步数。
+         * 每步 可以删除任意一个字符串中的一个字符。
+         * 思路：枚举每个字符 i、j，子问题前i、j个字符串相同的最小步数
+         * 下一个子问题，删除i，j；删除i，不删除j；删除j，不删除i
+         * */
+//        s = word1.toCharArray();
+//        t = word2.toCharArray();
+//        int n = s.length;
+//        int m = t.length;
+//        cache = new int[n][m];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(n - 1, m - 1);
+
+        // 翻译为递推
+        char[] s = word1.toCharArray();
+        char[] t = word2.toCharArray();
+        int n = s.length;
+        int m = t.length;
+        int[] dp = new int[m + 1];
+        for (int j = 0; j < m; j++) {
+            dp[j + 1] = j + 1;
+        }
+
+        for (int i = 0; i < n; i++) {
+            int pre = dp[0];
+            dp[0] = i + 1;
+            for (int j = 0; j < m; j++) {
+                int temp = dp[j + 1];
+                dp[j + 1] = s[i] == t[j] ? pre :
+                        Math.min(Math.min(dp[j + 1], dp[j]) + 1, pre + 2);
+                pre = temp;
+            }
+        }
+        return dp[m];
+
+    }
+
+    // dfs(i,j) 表示前i个字符与前j个字符相同的最小部署
+//    private int dfs(int i, int j) {
+//        if (i < 0) return j + 1;
+//        if (j < 0) return i + 1;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        if (s[i] == t[j]) return cache[i][j] = dfs(i - 1, j - 1); // 不用删除操作
+//
+//        return cache[i][j] = Math.min(Math.min(dfs(i, j - 1), dfs(i - 1, j)) + 1, dfs(i - 1, j - 1) + 2);
+//
+//    }
+}
+
+
 }
