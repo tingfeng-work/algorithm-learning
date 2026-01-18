@@ -1,6 +1,9 @@
 import javax.management.modelmbean.ModelMBean;
+import javax.print.DocFlavor;
 import javax.xml.stream.FactoryConfigurationError;
+import java.lang.annotation.Target;
 import java.util.*;
+import java.util.function.DoublePredicate;
 
 class Solution {
 
@@ -1054,7 +1057,697 @@ class Solution {
 //        return cache[i][j] = Math.min(Math.min(dfs(i, j - 1), dfs(i - 1, j)) + 1, dfs(i - 1, j - 1) + 2);
 //
 //    }
-}
+
+    public int minimumDeleteSum(String s1, String s2) {
+        /*712.两个字符串的最小 ASCII删除和
+         * 给定两个字符串s1 和 s2，返回 使两个字符串相等所需删除字符的 ASCII 值的最小和 。
+         * */
+        char[] s = s1.toCharArray();
+        char[] t = s2.toCharArray();
+        int m = t.length;
+        int[] dp = new int[m + 1];
+        for (int j = 0; j < m; j++) {
+            dp[j + 1] = t[j] + dp[j];
+        }
+        for (char c : s) {
+            int pre = dp[0];
+            dp[0] = c + dp[0];
+            for (int j = 0; j < m; j++) {
+                int temp = dp[j + 1];
+                dp[j + 1] = c == t[j] ? pre : Math.min(
+                        Math.min(dp[j + 1] + c, dp[j] + t[j]),
+                        pre + c + t[j]);
+                pre = temp;
+            }
+        }
+        return dp[m];
+    }
+
+
+//    private char[] chars1, chars2, chars3;
+//
+//    private int[][] cache;
+
+    public boolean isInterleave(String s1, String s2, String s3) {
+        /*97.交错字符串
+         * 给定三个字符串 s1、s2、s3，请你帮忙验证 s3 是否是由 s1 和 s2 交错 组成的。
+         * 思路：回溯：枚举字符串s3的字符 i，
+         * 如果字符c1与s（s1串中）字符相等，递归c1，如果s与字符串s2 中的c2相等递归c2
+         * */
+//        chars1 = s1.toCharArray();
+//        chars2 = s2.toCharArray();
+//        chars3 = s3.toCharArray();
+//
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int l = chars3.length;
+//        if (n + m != l) return false;
+//
+//        return dfs(n - 1, m - 1, l - 1);
+
+        // 回溯优化逻辑优化+记忆化搜索：
+//        chars1 = s1.toCharArray();
+//        chars2 = s2.toCharArray();
+//        chars3 = s3.toCharArray();
+//
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int l = chars3.length;
+//        if (n + m != l) return false;
+//
+//        cache = new int[n + 1][m + 1];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(n - 1, m - 1);
+        // 翻译为递推
+//        char[] chars1 = s1.toCharArray();
+//        char[] chars2 = s2.toCharArray();
+//        char[] chars3 = s3.toCharArray();
+//
+//        int n = chars1.length;
+//        int m = chars2.length;
+//        int l = chars3.length;
+//        if (n + m != l) return false;
+//
+//        boolean[][] dp = new boolean[n + 1][m + 1];
+//        dp[0][0] = true;
+//        for (int j = 0; j < m; j++) {
+//            dp[0][j + 1] = chars2[j] == chars3[j] && dp[0][j];
+//        }
+//        for (int i = 0; i < n; i++) {
+//            dp[i+1][0] = chars1[i] == chars3[i] && dp[i][0];
+//            for (int j = 0; j < m; j++) {
+//                dp[i + 1][j + 1] = chars1[i] == chars3[i + j + 1] && dp[i][j + 1] ||
+//                        chars2[j] == chars3[i + j + 1] && dp[i + 1][j];
+//            }
+//        }
+//        return dp[n][m];
+        // 进一步优化空间：
+        char[] chars1 = s1.toCharArray();
+        char[] chars2 = s2.toCharArray();
+        char[] chars3 = s3.toCharArray();
+
+        int n = chars1.length;
+        int m = chars2.length;
+        int l = chars3.length;
+        if (n + m != l) return false;
+
+        boolean[] dp = new boolean[m + 1];
+        dp[0] = true;
+        for (int j = 0; j < m; j++) {
+            dp[j + 1] = chars2[j] == chars3[j] && dp[j];
+        }
+        for (int i = 0; i < n; i++) {
+            dp[0] = chars1[i] == chars3[i] && dp[0];
+            for (int j = 0; j < m; j++) {
+                dp[j + 1] = chars1[i] == chars3[i + j + 1] && dp[j + 1] ||
+                        chars2[j] == chars3[i + j + 1] && dp[j];
+            }
+        }
+        return dp[m];
+
+    }
+
+//    private boolean dfs(int i, int j) {
+//        if (i < 0 && j < 0) return true;
+//
+//        if (cache[i + 1][j + 1] != -1) return cache[i + 1][j + 1] == 1;
+//
+//        boolean res = (i >= 0 && chars1[i] == chars3[i + j + 1] && dfs(i - 1, j)) ||
+//                (j >= 0 && chars2[j] == chars3[i + j + 1] && dfs(i, j - 1));
+//        cache[i + 1][j + 1] = res ? 1 : 0;
+//        return res;
+//    }
+//
+//    private boolean dfs(int i, int j, int k) {
+//        if (k < 0)
+//            return true;
+//        char c = chars3[k];
+//        if (i >= 0 && j >= 0) {
+//            if (chars1[i] != c && chars2[j] != c) {
+//                return false;
+//            }
+//            if (chars1[i] == c && chars2[j] == c)
+//                return dfs(i - 1, j, k - 1) || dfs(i, j - 1, k - 1);
+//            else if (chars1[i] == c) return dfs(i - 1, j, k - 1);
+//            else return dfs(i, j - 1, k - 1);
+//        } else if (i >= 0) {
+//            return chars1[i] == c && dfs(i - 1, j, k - 1);
+//        } else if (j >= 0) return chars2[j] == c && dfs(i, j - 1, k - 1);
+//        else return false;
+//
+//
+//    }
+
+    public int maxDotProduct(int[] nums1, int[] nums2) {
+        /*1458.两个子序列的最大点积
+         * 枚举第 i、j 个数，如果 i*j > 0 选，否则 i 不选，或 j 不选的最大值
+         * */
+//        int n = nums1.length;
+//        int m = nums2.length;
+//        int[][] cache = new int[n][m];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, Integer.MIN_VALUE);
+//        }
+//        return dfs(n - 1, m - 1, nums1, nums2, cache);
+        //翻译为递推
+//        int n = nums1.length;
+//        int m = nums2.length;
+//        int[][] dp = new int[n + 1][m + 1];
+//        for (int[] ints : dp) {
+//            Arrays.fill(ints, Integer.MIN_VALUE / 2);
+//        }
+//        for (int i = 0; i < n; i++) {
+//            for (int j = 0; j < m; j++) {
+//                dp[i + 1][j + 1] = Math.max(
+//                        Math.max(dp[i][j] + nums1[i] * nums2[j], nums1[i] * nums2[j]),
+//                        Math.max(dp[i][j + 1], dp[i + 1][j]));
+//            }
+//        }
+//        return dp[n][m];
+        // 空间优化
+        int m = nums2.length;
+        int[] dp = new int[m + 1];
+
+        Arrays.fill(dp, Integer.MIN_VALUE / 2);
+
+        for (int x : nums1) {
+            int pre = dp[0];
+            for (int j = 0; j < m; j++) {
+                int temp = dp[j + 1];
+                dp[j + 1] = Math.max(
+                        Math.max(pre + x * nums2[j], x * nums2[j]),
+                        Math.max(dp[j + 1], dp[j]));
+                pre = temp;
+            }
+        }
+        return dp[m];
+    }
+
+    // dfs(i,j) 表示前i个数与前j个数的最大点积
+//    private int dfs(int i, int j, int[] nums1, int[] nums2, int[][] cache) {
+//        if (i < 0 || j < 0) return Integer.MIN_VALUE / 2; // 枚举完了
+//        if (cache[i][j] != Integer.MIN_VALUE) return cache[i][j];
+//
+//        return cache[i][j] = Math.max(
+//                Math.max(dfs(i - 1, j - 1, nums1, nums2, cache) + nums1[i] * nums2[j], nums1[i] * nums2[j]),
+//                Math.max(dfs(i - 1, j, nums1, nums2, cache), dfs(i, j - 1, nums1, nums2, cache)));
+//
+//    }
+
+    private char[] s, t;
+    private int[][] cache;
+
+    public String shortestCommonSupersequence(String str1, String str2) {
+        /*1092. 最短公共超序列
+         * 给你两个字符串 str1 和 str2，返回同时以 str1 和 str2 作为 子序列 的最短字符串。
+         * 如果答案不止一个，则可以返回满足条件的 任意一个 答案。
+         * 也就是要生成一个最短字符串，满足 str1与str2都是它的子序列
+         *
+         * */
+//        s = str1.toCharArray();
+//        t = str2.toCharArray();
+//        int n = s.length;
+//        int m = t.length;
+//        String[][] cache = new String[n][m];
+//
+//        return dfs(n - 1, m - 1, cache);
+        // 翻译为递推
+
+//        char[] s = str1.toCharArray();
+//        char[] t = str2.toCharArray();
+//        int m = t.length;
+//        String[] dp = new String[m + 1];
+//        dp[0] = "";
+//        for (int i = 0; i < m; i++) {
+//            dp[i + 1] = dp[i] + t[i];
+//        }
+//
+//        for (char c : s) {
+//            String pre = dp[0];
+//            dp[0] = dp[0] + c;
+//            for (int j = 0; j < m; j++) {
+//                String temp = dp[j + 1];
+//                dp[j + 1] = c == t[j] ? pre + c :
+//                        dp[j + 1].length() < dp[j].length() ? dp[j + 1] + c : dp[j] + t[j];
+//                pre = temp;
+//            }
+//        }
+//        return dp[m];
+
+        // 递归长度与构造答案分开
+        s = str1.toCharArray();
+        t = str2.toCharArray();
+        int n = s.length;
+        int m = t.length;
+        cache = new int[n][m];
+        for (int[] ints : cache) {
+            Arrays.fill(ints, -1);
+        }
+        return makeAns(n - 1, m - 1);
+
+
+    }
+
+    private String makeAns(int i, int j) {
+        if (i < 0) return new String(t, 0, j + 1);
+        if (j < 0) return new String(s, 0, i + 1);
+        if (s[i] == t[j]) {
+            return makeAns(i - 1, j - 1) + s[i];
+        }
+        if (dfs(i, j) == dfs(i - 1, j) + 1) return makeAns(i - 1, j) + s[i];
+        else return makeAns(i, j - 1) + t[j];
+    }
+
+    // dfs(i,j) 表示前 i 个字符与前 j 个字符的最短超序列
+    private int dfs(int i, int j) {
+        if (i < 0) return j + 1;
+        if (j < 0) return i + 1;
+        if (cache[i][j] != -1) return cache[i][j];
+
+        if (s[i] == t[j]) return cache[i][j] = dfs(i - 1, j - 1) + 1;
+        else return cache[i][j] = Math.min(dfs(i - 1, j) + 1, dfs(i, j - 1) + 1);
+
+    }
+
+    // dfs(i,j) 表示前i字符与前j个字符的最短公共超序列序列的长度
+//    private String dfs(int i, int j, String[][] cache) {
+//        if (i < 0 && j < 0) {
+//            return "";
+//        }
+//        if (i < 0) {
+//            return new String(t, 0, j + 1);
+//        }
+//        if (j < 0) return new String(s, 0, i + 1);
+//
+//        if (cache[i][j] != null) return cache[i][j];
+//
+//        if (s[i] == t[j]) return dfs(i - 1, j - 1, cache) + s[i];
+//        String str1 = dfs(i - 1, j, cache) + s[i];
+//        String str2 = dfs(i, j - 1, cache) + t[j];
+//        return cache[i][j] = str1.length() > str2.length() ? str2 : str1;
+//    }
+
+    public int lengthOfLIS(int[] nums) {
+        /*300.最长递增子序列
+         * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+         * 思路：子序列也是子集的一种，考虑枚举选不选与答案选哪个。
+         * 因为严格递增，如果枚举选不选，需要维护上一个元素的下标，
+         * 枚举答案选哪个，只用循环找到前一个数，递归参数只有一个。
+         * */
+//        int n = nums.length;
+//        int[] cache = new int[n];
+//        int ans = 0;
+//        for (int i = 0; i < nums.length; i++) {
+//            ans = Math.max(dfs(i, nums, cache), ans);
+//        }
+//        return ans;
+        // 翻译为递推
+//        int n = nums.length;
+//        int[] dp = new int[n];
+//        int ans = 0;
+//        for (int i = 0; i < nums.length; i++) {
+//            for (int j = i - 1; j >= 0; j--) {
+//                if (nums[j] < nums[i]) dp[i] = Math.max(dp[j], dp[i]);
+//            }
+//            ans = Math.max(++dp[i], ans);
+//        }
+//
+//        return ans;
+
+        // 贪心加二分
+
+//        List<Integer> g = new ArrayList<>(nums.length); // g[i] 表示 长为 i+1 的上升子序列的末尾元素的最小值
+//        for (int num : nums) {
+//            int j = binarySearch(num, g);
+//            if (j == g.size()) {
+//                // 元素不存在加入集合
+//                g.add(num);
+//            } else {
+//                g.set(j, num);
+//            }
+//        }
+//        return g.size();
+        //原地修改
+        int len = 0;
+        for (int num : nums) {
+            int j = binarySearch(num + 1, nums, len);
+            nums[j] = num;
+            if (j == len)
+                len++;
+        }
+        return len;
+    }
+
+    private int binarySearch(int target, int[] nums, int right) {
+        int left = 0;
+        //左闭右开区间写法
+        while (left < right) {
+            int mid = (left + right) >>> 1;
+            if (nums[mid] < target) left = mid + 1;
+            else right = mid;
+        }
+        return left;
+    }
+
+    private int binarySearch(int num, List<Integer> g) {
+        int left = -1;
+        int right = g.size();
+
+        while (left + 1 < right) {
+            int mid = (left + right) >>> 1;
+            if (g.get(mid) >= num) {
+                right = mid;
+            } else {
+                left = mid;
+            }
+
+        }
+        return left + 1;
+    }
+
+    // dfs(i) 表示以nums[i] 结尾的最长递增子序列长度
+//    private int dfs(int i, int[] nums, int[] cache) {
+//        if (cache[i] > 0) return cache[i];
+//        int res = 0;
+//        for (int j = i - 1; j >= 0; j--) {
+//            if (nums[j] < nums[i]) {
+//                // 符合要求加入
+//                res = Math.max(dfs(j, nums, cache), res);
+//            }
+//
+//        }
+//        return cache[i] = (res + 1);
+//    }
+
+    public int minimumOperations(List<Integer> nums) {
+        /*2826.将三个组排序
+        整数数组 nums 。nums 的每个元素是 1，2 或 3。
+        在每次操作中，你可以删除 nums 中的一个元素。
+        返回使 nums 成为 非递减 顺序所需操作数的最小值。
+        思路：构造最长非递减的子序列 a，用nums的长度减去子序列 a 的长度就是最小操作数
+        * */
+//        int len = nums.size();
+//        int[] ints = new int[len];
+//        for (int i = 0; i < len; i++) {
+//            ints[i] = nums.get(i);
+//        }
+//        return len - lengthOfLIS(ints);
+        // DP 枚举当前元素选不选
+        // dp[i][j] 表示前i个元素的最大值小于等j的最长子序列的长度，x 表示当前元素
+        // x>j 不能选当前元素 dp[i][j] = dp[i-1][j]
+//        x<=j 选 dp[i-1][x] +1 和 dp[i-1][j] 的较大值
+//        int len = nums.size();
+//        int[][] dp = new int[len + 1][4];
+//        for (int i = 0; i < len; i++) {
+//            int x = nums.get(i);
+//            for (int j = 1; j < 4; j++) {
+//                if (x > j) dp[i + 1][j] = dp[i][j];
+//                else dp[i + 1][j] = Math.max(dp[i][x] + 1, dp[i][j]);
+//            }
+//        }
+//        return len - dp[len][3];
+        int[] dp = new int[4];
+        for (int x : nums) {
+            dp[x]++;
+            dp[2] = Math.max(dp[1], dp[2]);
+            dp[3] = Math.max(dp[2], dp[3]);
+        }
+        return nums.size() - dp[3];
+    }
+
+    public int[] longestObstacleCourseAtEachPosition(int[] obstacles) {
+        /*你打算构建一些障碍赛跑路线。
+        给你一个 下标从 0 开始 的整数数组 obstacles ，数组长度为 n ，其中 obstacles[i] 表示第 i 个障碍的高度
+        对于每个介于 0 和 n - 1 之间（包含 0 和 n - 1）的下标  i ，
+        在满足下述条件的前提下，请你找出 obstacles 能构成的最长障碍路线的长度：
+        你可以选择下标介于 0 到 i 之间（包含 0 和 i）的任意个障碍。
+        在这条路线中，必须包含第 i 个障碍。
+        你必须按障碍在 obstacles 中的 出现顺序 布置这些障碍。
+        除第一个障碍外，路线中每个障碍的高度都必须和前一个障碍 相同 或者 更高 (非递减序列)。
+        返回长度为 n 的答案数组 ans ，其中 ans[i] 是上面所述的下标 i 对应的最长障碍赛跑路线的长度。
+        * 求i个数构成的最长非递减序列
+        * dp[i][j] 表示i个数最大值不超过j的最长非递减序列, 该序列必须包含 nums[i],也就是以 nums[i] 为最大值
+        nums[i] =x
+        dp[i][x] = dp[i-1][x] +1 dp[i-1][1~x-1]
+
+        * */
+//        int len = obstacles.length;
+//        int mx = 0;
+//        for (int obstacle : obstacles) {
+//            mx = Math.max(obstacle, mx);
+//        }
+//        int[] ans = new int[len];
+//        int[][] dp = new int[len + 1][mx + 1];
+//        for (int k = 0; k < len; k++) {
+//            for (int i = 0; i <= k; i++) {
+//                int x = obstacles[i];
+//                for (int j = x; j > 0; j--) {
+//                    dp[i + 1][x] = Math.max(dp[i][j] + 1, dp[i + 1][x]);
+//                }
+//            }
+//            ans[k] = dp[k + 1][obstacles[k]];
+//        }
+//
+//
+//        return ans;
+        // 回溯：枚举以第 i 个元素结尾的非递减子序列的最长长度
+//        int len = obstacles.length;
+//        int[] ans = new int[len];
+//        int[] cache = new int[len];
+//        for (int i = 0; i < len; i++) {
+//            ans[i] = dfs(i, obstacles, cache);
+//        }
+//        return ans;
+        // 动规 dp[i] 表示以第i个元素结尾的非递减子序列的最长长度
+        // g[i] 表示长度为 i+1 的非递减子序列的尾元素最小值
+//        int len = obstacles.length;
+//        int[] dp = new int[len];
+//
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i - 1; j >= 0; j--) {
+//                if (obstacles[j] <= obstacles[i]) dp[i] = Math.max(dp[j], dp[i]);
+//            }
+//            dp[i]++;
+//        }
+//        return dp;
+        //贪心+二分
+        int len = obstacles.length;
+        int[] ans = new int[len];
+        List<Integer> g = new ArrayList<>();
+        int i = 0;
+        for (int x : obstacles) {
+            int j = binary(x, g);
+            if (j == g.size()) {
+                g.add(x);
+                ans[i++] = g.size();
+            } else {
+                g.set(j, x);
+                ans[i++] = j + 1;
+            }
+        }
+        return ans;
+
+    }
+
+//    private int binary(int x, List<Integer> g) {
+//        int left = -1;
+//        int right = g.size();
+//        while (left + 1 < right) {
+//            int mid = (left + right) >>> 1;
+//            if (g.get(mid) > x) right = mid;
+//            else left = mid;
+//        }
+//        return right;
+//    }
+
+    // 返回以 i 结尾的非递减子序列的最长长度
+//    private int dfs(int i, int[] obstacles, int[] cache) {
+//        if (i < 0) return 0;
+//        if (cache[i] != 0) return cache[i];
+//        int res = 0;
+//        for (int j = i - 1; j >= 0; j--) {
+//            if (obstacles[j] <= obstacles[i]) res = Math.max(dfs(j, obstacles, cache), res);
+//        }
+//        return cache[i] = res + 1;
+//    }
+
+
+    public int minimumMountainRemovals(int[] nums) {
+        /*1671.得到山形数组的最少删除次数
+        * 我们定义 arr 是 山形数组 当且仅当它满足：
+        * arr.length >= 3
+        * 存在某个下标 i （从 0 开始） 满足 0 < i < arr.length - 1 且：
+        arr[0] < arr[1] < ... < arr[i - 1] < arr[i]
+        arr[i] > arr[i + 1] > ... > arr[arr.length - 1]
+        给你整数数组 nums ，请你返回将 nums 变成 山形状数组 的最少 删除次数。
+        * 思路：枚举 nums[i] 其左边的元素构成严格递增子序列的最长长度 len1
+        * 其右边的元素构成严格递减的子序列的最长长度 len2
+        * ans = nums.length - len1 -len2 +1;
+        * */
+//        int len = nums.length;
+//        int ans = len;
+//        int[] cache1 = new int[len];
+//        int[] cache2 = new int[len];
+//        for (int i = 1; i < len - 1; i++) {
+//            int len1 = LIS(i, nums, cache1);
+//            int len2 = LDS(i, nums, cache2);
+//            if (len1 >= 2 && len2 >= 2)
+//                ans = Math.min(ans, len - len1 - len2 + 1);
+//        }
+//        return ans;
+        //翻译为递推
+//        int len = nums.length;
+//        int ans = len;
+//        int[] f1 = new int[len];
+//        int[] f2 = new int[len];
+//        for (int i = len - 1; i >= 0; i--) {
+//            for (int j = i + 1; j < len; j++) {
+//                if (nums[i] > nums[j]) f1[i] = Math.max(f1[i], f1[j]);
+//            }
+//            f1[i]++;
+//        }
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i - 1; j >= 0; j--) {
+//                if (nums[i] > nums[j]) f2[i] = Math.max(f2[i], f2[j]);
+//            }
+//            f2[i]++;
+//            if (f1[i] >= 2 && f2[i] >= 2)
+//                ans = Math.min(ans, len - f1[i] - f2[i] + 1);
+//        }
+//
+//        return ans;
+        //贪心+二分
+        int len = nums.length;
+        int[] suf = new int[len];
+        List<Integer> g = new ArrayList<>();
+        for (int i = len - 1; i > 0; i--) {
+            int j = binary(nums[i], g);
+            if (j == g.size())
+                g.add(nums[i]);
+            else
+                g.set(j, nums[i]);
+            suf[i] = j + 1;
+        }
+        int ans = len;
+        g.clear();
+        for (int i = 1; i < len - 1; i++) {
+            int x = nums[i];
+            int j = binary(x, g);
+            if (j == g.size())
+                g.add(x);
+            else g.set(j, x);
+            int pre = j + 1;
+            if (pre >= 2 && suf[i] >= 2)
+                ans = Math.min(ans, len - pre - suf[i] + 1);
+        }
+        return ans;
+
+    }
+
+//    private int binary(int num, List<Integer> g) {
+//        int left = -1;
+//        int right = g.size();
+//        while (left + 1 < right) {
+//            int mid = (left + right) >>> 1;
+//            if (g.get(mid) >= num) right = mid;
+//            else left = mid;
+//        }
+//        return right;
+//    }
+
+//    //LDS(i) 表示后i个数构成的LDS的最长长度
+//    private int LDS(int i, int[] nums, int[] cache) {
+//        if (cache[i] != 0) return cache[i];
+//        int res = 0;
+//        for (int j = i + 1; j < nums.length; j++) {
+//            if (nums[i] > nums[j]) res = Math.max(LDS(j, nums, cache), res);
+//        }
+//        return cache[i] = res + 1;
+//    }
+//
+//    // LIS(i) 前i个数构成的 LIS 的最长长度
+//    private int LIS(int i, int[] nums, int[] cache) {
+//        if (cache[i] != 0) return cache[i];
+//        int res = 0;
+//        for (int j = i - 1; j >= 0; j--) {
+//            if (nums[i] > nums[j]) res = Math.max(LIS(j, nums, cache), res);
+//        }
+//        return cache[i] = res + 1;
+//    }
+
+    public int kIncreasing(int[] arr, int k) {
+        /*2111. 使数组 K 递增的最少操作次数
+        给你一个下标从 0 开始包含 n 个正整数的数组 arr ，和一个正整数 k 。
+        如果对于每个满足 k <= i <= n-1 的下标 i ，都有 arr[i-k] <= arr[i] ，那么我们称 arr 是 K 递增 的。
+        就是每隔k-1个数,非递减
+        每一次 操作 中，你可以选择一个下标 i 并将 arr[i] 改成任意 正整数。
+        请你返回对于给定的 k ，使数组变成 K 递增的 最少操作次数 。
+        分为k组，求每组的最长的非递减子序列
+        ans = arr.length - 每组的最长非递减子序列长度
+        *
+        * */
+//        int len = arr.length;
+//        int[] lens = new int[k];//lens[i] 表示第i组的最长非递减子序列长度
+//        List<Integer> g = new ArrayList<>();
+//        for (int i = 0; i < k; i++) {
+//            g.clear();
+//            for (int j = i; j < len; j = k + j) {
+//                int x = arr[j];
+//                int m = binary(x, g);
+//                if (m == g.size())
+//                    g.add(x);
+//                else g.set(m, x);
+//            }
+//            lens[i] = g.size();
+//        }
+//        int ans = len;
+//        for (int i : lens) {
+//            ans = ans - i;
+//        }
+//        return ans;
+        // 动态规划 dp[i] 表示以arr[i]元素结尾的最长非递减序列长度
+        //        for (int i = 0; i < len; i++) {
+//            for (int j = i - 1; j >= 0; j--) {
+//                if (obstacles[j] <= obstacles[i]) dp[i] = Math.max(dp[j], dp[i]);
+//            }
+//            dp[i]++;
+//        }
+        int len = arr.length;
+        int[] lens = new int[k];
+        for (int i = 0; i < k; i++) {
+            int[] dp = new int[len];
+            int mx = 0;
+            for (int j = i; j < len; j = j + k) {
+                for (int m = j - k; m >= 0; m = m - k) {
+                    if (arr[m] <= arr[j]) dp[j] = Math.max(dp[m], dp[j]);
+                }
+                dp[j]++;
+
+            }
+
+            lens[i] = mx;
+        }
+        int ans = len;
+        for (int i : lens) {
+            ans = ans - i;
+        }
+        return ans;
+    }
+
+    //找到第一个大于x的位置
+    private int binary(int x, List<Integer> g) {
+        int left = -1;
+        int right = g.size();
+        while (left + 1 < right) {
+            int mid = (left + right) >>> 1;
+            if (g.get(mid) <= x) left = mid;
+            else right = mid;
+        }
+        return right;
+    }
 
 
 }
+
