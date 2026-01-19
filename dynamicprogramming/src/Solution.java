@@ -1737,17 +1737,115 @@ class Solution {
     }
 
     //找到第一个大于x的位置
+//    private int binary(int x, List<Integer> g) {
+//        int left = -1;
+//        int right = g.size();
+//        while (left + 1 < right) {
+//            int mid = (left + right) >>> 1;
+//            if (g.get(mid) <= x) left = mid;
+//            else right = mid;
+//        }
+//        return right;
+//    }
+
+    public int maxEnvelopes(int[][] envelopes) {
+        /*354.俄罗斯套娃信封问题
+         * 给你一个二维整数数组 envelopes ，其中 envelopes[i] = [wi, hi] ，表示第 i 个信封的宽度和高度。
+         * 当另一个信封的宽度和高度都比这个信封大的时候，这个信封就可以放进另一个信封里，如同俄罗斯套娃一样。
+         * 请计算 最多能有多少个 信封能组成一组“俄罗斯套娃”信封（即可以把一个信封放到另一个信封里面）。
+         * 注意：不允许旋转信封
+         * 思路：先对envelopes按照宽w来排序，只需要求关于h的LIS了，
+         * 枚举答案选哪个，只能选比当前元素大的元素，递归选
+         * */
+        int len = envelopes.length;
+        // 双关键字排序：宽度降序，高度升序
+        Arrays.sort(envelopes, (a, b) -> {
+            if (a[0] == b[0]) {
+                return a[1] - b[1];
+            }
+            return b[0] - a[0];
+        });
+
+//        int ans = 0;
+//        int[] cache = new int[len];
+//        for (int i = 0; i < len; i++) {
+//            ans = Math.max(dfs(i, envelopes, cache), ans);
+//        }
+//        return ans;
+        //翻译为递推
+//        int[] dp = new int[len];
+//        int ans = 0;
+//        for (int i = 0; i < len; i++) {
+//            for (int j = i - 1; j >= 0; j--) {
+//                if (envelopes[j][0] > envelopes[i][0] && envelopes[j][1] > envelopes[i][1])
+//                    dp[i] = Math.max(dp[j], dp[i]);
+//            }
+//            ans = Math.max(ans, ++dp[i]);
+//        }
+//
+//        return ans;
+        // 贪心+二分
+        List<Integer> g = new ArrayList<>();
+        for (int i = len - 1; i >= 0; i--) {
+            int x = envelopes[i][1];
+            int j = binary(x, g);
+            if (j == g.size())
+                g.add(x);
+            else
+                g.set(j, x);
+        }
+        return g.size();
+    }
+
     private int binary(int x, List<Integer> g) {
         int left = -1;
         int right = g.size();
         while (left + 1 < right) {
             int mid = (left + right) >>> 1;
-            if (g.get(mid) <= x) left = mid;
+            if (g.get(mid) < x) left = mid;
             else right = mid;
         }
         return right;
     }
+    // dfs(i) 表示前i个元素的最大套娃数
+//    private int dfs(int i, int[][] envelopes, int[] cache) {
+//        if (i < 0) return 0;
+//        if (cache[i] != 0) return cache[i];
+//        int w = envelopes[i][0];
+//        int h = envelopes[i][1];
+//        int res = 0;
+//        for (int j = i - 1; j >= 0; j--) {
+//            // 枚举选哪个
+//            if (envelopes[j][0] > w && envelopes[j][1] > h) res = Math.max(dfs(j, envelopes, cache), res);
+//        }
+//        return cache[i] = res + 1;
+//    }
+    /*
+    *     public int maxEnvelopes(int[][] envelopes) {
+        int len = envelopes.length;
+        int[] dp = new int[len];
+        for (int i = 0; i < len; i++) {
+            for (int j = i - 1; j >= 0; j--) {
+                if (check(i, j, envelopes)) dp[i] = Math.max(dp[j], dp[i]);
+            }
+            dp[i]++;
+        }
+        return dp[len - 1];
+    }
+      private boolean check(int i, int j, int[][] envelopes) {
+        return envelopes[i][0] < envelopes[j][0] && envelopes[i][1] < envelopes[j][1];
+    }
+    * */
 
+    public int bestTeamScore(int[] scores, int[] ages) {
+        /*1626.无矛盾的最佳球队
+        * 假设你是球队的经理。对于即将到来的锦标赛，你想组合一支总体得分最高的球队。球队的得分是球队中所有球员的分数总和
+        * 然而，球队中的矛盾会限制球员的发挥，所以必须选出一支 没有矛盾 的球队。
+        * 如果一名年龄较小球员的分数 严格大于 一名年龄较大的球员，则存在矛盾。同龄球员之间不会发生矛盾。
+        * 给你两个列表 scores 和 ages，其中每组 scores[i] 和 ages[i] 表示第 i 名球员的分数和年龄。
+        * 请你返回 所有可能的无矛盾球队中得分最高那支的分数 。
+         * */
+    }
 
 }
 
