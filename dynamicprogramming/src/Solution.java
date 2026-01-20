@@ -1,9 +1,6 @@
-import javax.management.modelmbean.ModelMBean;
-import javax.print.DocFlavor;
-import javax.xml.stream.FactoryConfigurationError;
-import java.lang.annotation.Target;
-import java.util.*;
-import java.util.function.DoublePredicate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class Solution {
 
@@ -1837,14 +1834,170 @@ class Solution {
     }
     * */
 
-    public int bestTeamScore(int[] scores, int[] ages) {
-        /*1626.无矛盾的最佳球队
-        * 假设你是球队的经理。对于即将到来的锦标赛，你想组合一支总体得分最高的球队。球队的得分是球队中所有球员的分数总和
-        * 然而，球队中的矛盾会限制球员的发挥，所以必须选出一支 没有矛盾 的球队。
-        * 如果一名年龄较小球员的分数 严格大于 一名年龄较大的球员，则存在矛盾。同龄球员之间不会发生矛盾。
-        * 给你两个列表 scores 和 ages，其中每组 scores[i] 和 ages[i] 表示第 i 名球员的分数和年龄。
-        * 请你返回 所有可能的无矛盾球队中得分最高那支的分数 。
+    /*    public int maxProfit(int[] prices) {
+     *//*122.买卖股票的最佳时机
+     * 一个整数数组 prices ，其中 prices[i] 表示某支股票第 i 天的价格
+     * 在每一天，你可以决定是否购买和/或出售股票。你在任何时候 最多 只能持有 一股 股票。
+     * 返回你能获得的最大利润 。
+     * 思路：倒着枚举第 i 天，当前操作：无操作、买入、卖出；子问题前 i 天的最大利润
+     * 下一个子问题：经过当前操作，前 i-1 天的最大利润
+     * 需要一个状态参数 hold 表示第 i 天是否持有股票
+     * *//*
+//        int len = prices.length;
+//        int[][] cache = new int[len][2];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, Integer.MIN_VALUE);
+//        }
+//        return dfs(len - 1, 0, prices, cache);
+        //翻译为递推
+        // dp[i][0] 表示前i天包括第i天结束时，未持有股票的最大利润
+        int f0 = 0;
+        int f1 = Integer.MIN_VALUE;
+        for (int price : prices) {
+            int new_f0 = Math.max(f0, f1 + price);
+            f1 = Math.max(f1, f0 - price);
+            f0 = new_f0;
+
+        }
+        return f0;
+    }*/
+
+    // dfs(i,hold) 表示前i天包括第i天结束时，持有股票/未持有股票的最大利润
+    // 注意第i天结束，也相当于第 i-1 天开始，这是线性时间导致的
+//    private int dfs(int i, int hold, int[] prices, int[][] cache) {
+//        if (i < 0)
+//            return hold == 1 ? Integer.MIN_VALUE : 0;
+//        if (cache[i][hold] != Integer.MIN_VALUE) return cache[i][hold];
+//        if (hold == 1)
+//            return cache[i][hold] = Math.max(dfs(i - 1, 1, prices, cache), dfs(i - 1, 0, prices, cache) - prices[i]);
+//        else return cache[i][hold] = Math.max(dfs(i - 1, 0, prices, cache), dfs(i - 1, 1, prices, cache) + prices[i]);
+//
+//
+//    }
+
+//    public int maxProfit(int[] prices) {
+//        /*309.买卖股票的最佳时机含冷冻期
+//         * 题目描述与122相同，只是增加了一个约束条件
+//         * 卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
+//         * 思路：类似打家劫舍，枚举第 i 天，如果想买入股票，前一天不能卖出，状态由 i-2 转移来
+//         * */
+
+    /// /        int len = prices.length;
+    /// /        int[][] dp = new int[len + 2][2];
+    /// /        dp[1][1] = Integer.MIN_VALUE;
+    /// /        dp[0][1] = Integer.MIN_VALUE;
+    /// /        for (int i = 0; i < len; i++) {
+    /// /            dp[i + 2][0] = Math.max(dp[i + 1][0], dp[i + 1][1] + prices[i]);
+    /// /            dp[i + 2][1] = Math.max(dp[i + 1][1], dp[i][0] - prices[i]);
+    /// /        }
+    /// /        return dp[len + 1][0];
+//        int f0 = 0, f1 = Integer.MIN_VALUE;
+//        int pre = 0;
+//        for (int price : prices) {
+//            int new_f0 = Math.max(f0, f1 + price);
+//            f1 = Math.max(f1, pre - price);
+//            pre = f0;
+//            f0 = new_f0;
+//        }
+//        return f0;
+//    }
+//    public int maxProfit(int k, int[] prices) {
+//        /*188.买卖股票最佳时机 Ⅳ
+//         * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 k 笔交易。也就是说，你最多可以买 k 次，卖 k 次。
+////         * */
+////        int len = prices.length;
+////        int[][][] cache = new int[len][2][k+1];
+////        for (int[][] ints : cache) {
+////            for (int[] anInt : ints) {
+////                Arrays.fill(anInt, Integer.MIN_VALUE);
+////            }
+////        }
+////        return dfs(len - 1, 0, k, prices, cache);
+//        //翻译为递推
+
+    /// /        int len = prices.length;
+    /// /        int[][][] dp = new int[len + 1][2][k+2];
+    /// /        for (int i = 0; i < len + 1; i++) {
+    /// /            for (int j = 0; j < 2; j++) {
+    /// /                dp[i][j][0] = Integer.MIN_VALUE / 2;
+    /// /            }
+    /// /        }
+    /// /        for (int i = 0; i < k + 2; i++) {
+    /// /            dp[0][1][i] = Integer.MIN_VALUE / 2;
+    /// /        }
+    /// /        for (int i = 0; i < len; i++) {
+    /// /            for (int j = 0; j < k + 1; j++) {
+    /// /                dp[i + 1][0][j+1] = Math.max(dp[i][0][j+1], dp[i][1][j] + prices[i]);
+    /// /                dp[i + 1][1][j+1] = Math.max(dp[i][1][j+1], dp[i][0][j+1] - prices[i]);
+    /// /            }
+    /// /        }
+    /// /        return dp[len][0][k+1];
+//        // 空间优化
+//        int[][] dp = new int[2][k + 2];
+//
+//        for (int j = 0; j < 2; j++) {
+//            dp[j][0] = Integer.MIN_VALUE / 2;
+//        }
+//
+//        for (int i = 0; i < k + 2; i++) {
+//            dp[1][i] = Integer.MIN_VALUE / 2;
+//        }
+//        for (int price : prices) {
+//            for (int j = 0; j < k + 1; j++) {
+//                dp[0][j + 1] = Math.max(dp[0][j + 1], dp[1][j] + price);
+//                dp[1][j + 1] = Math.max(dp[1][j + 1], dp[0][j + 1] - price);
+//            }
+//        }
+//        return dp[0][k + 1];
+//    }
+
+//    // dfs(i,hold,k) 表示在第i天结束时，hold 状态下，还剩 k 次买卖股票的机会的最大利润
+//    private int dfs(int i, int hold, int k, int[] prices, int[][][] cache) {
+//        if (i < 0)
+//            return hold == 1 ? Integer.MIN_VALUE : 0;
+//        if (k < 0)
+//            return Integer.MIN_VALUE;
+//        if (cache[i][hold][k] != Integer.MIN_VALUE) return cache[i][hold][k];
+//        if (hold == 1)
+//            return cache[i][hold][k] = Math.max(dfs(i - 1, 1, k, prices, cache), dfs(i - 1, 0, k, prices, cache) - prices[i]);
+//        else
+//            return cache[i][hold][k] = Math.max(dfs(i - 1, 0, k, prices, cache), dfs(i - 1, 1, k - 1, prices, cache) + prices[i]);
+//    }
+    public int maxProfit(int[] prices) {
+        /*121.买卖股票的最佳时机
+         * 只能交易一次
          * */
+        int ans = 0;
+        int minPrice = prices[0];
+        for (int price : prices) {
+            ans = Math.max(ans, price - minPrice);
+            minPrice = Math.min(price, minPrice);
+        }
+        return ans;
+    }
+
+    public int maxProfit(int[] prices, int fee) {
+        /*714.买卖股票的最佳时机含手续费
+         * 给定一个整数数组 prices，其中 prices[i]表示第 i 天的股票价格 ；整数 fee 代表了交易股票的手续费用。
+         * 注意：这里的一笔交易指买入持有并卖出股票的整个过程，每笔交易你只需要为支付一次手续费。
+         * */
+//        int len = prices.length;
+//        int[][] dp = new int[len + 1][2];
+//        dp[0][1] = Integer.MIN_VALUE/2;
+//        for (int i = 0; i < len; i++) {
+//            dp[i + 1][0] = Math.max(dp[i][0], dp[i][1] + prices[i] - fee);
+//            dp[i + 1][1] = Math.max(dp[i][1], dp[i][0] - prices[i]);
+//        }
+//        return dp[len][0];
+        // 空间优化
+        int f0 = 0;
+        int f1 = Integer.MIN_VALUE / 2;
+        for (int price : prices) {
+            int new_f0 = Math.max(f0, f1 + price - fee);
+            f1 = Math.max(f1, f0 - price);
+            f0 = new_f0;
+        }
+        return f0;
     }
 
 }
