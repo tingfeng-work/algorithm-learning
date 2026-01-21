@@ -2000,5 +2000,98 @@ class Solution {
         return f0;
     }
 
+    public long maxScore(int[] nums, int x) {
+        /*2786.访问数组中的位置使分数最大
+        * 给你一个下标从 0 开始的整数数组 nums 和一个正整数 x
+        * 你 一开始 在数组的位置 0 处，你可以按照下述规则访问数组中的其他位置：
+        * 如果你当前在位置 i ，那么你可以移动到满足 i < j 的 任意 位置 j 。
+        对于你访问的位置 i ，你可以获得分数 nums[i] 。
+        如果你从位置 i 移动到位置 j 且 nums[i] 和 nums[j] 的 奇偶性 不同，那么你将失去分数 x 。
+        请你返回你能得到的 最大 得分之和。
+        * 注意 ，你一开始的分数为 nums[0] 。
+        * 思路：枚举当前元素选不选，如果当前元素和前一个元素的奇偶性相同，必须选
+         * */
+//
+//        long[][] cache = new long[nums.length][2];
+//        for (long[] longs : cache) {
+//            Arrays.fill(longs, -1);
+//        }
+//        return dfs(0, nums[0] % 2, x, nums, cache);
+        //翻译为递推
+//        int len = nums.length;
+//        long[][] dp = new long[len + 1][2];
+//        for (int i = len - 1; i >= 0; i--) {
+//            int j = nums[i] % 2; // 当前奇偶性
+//            dp[i][j] = dp[i + 1][j] + nums[i];
+//            dp[i][j ^ 1] = Math.max(dp[i + 1][j] - x + nums[i], dp[i + 1][j^1]);
+//        }
+//        return dp[0][nums[0] %2];
+        //空间优化
+        int len = nums.length;
+        long[] dp = new long[2];
+        for (int i = len - 1; i >= 0; i--) {
+            int j = nums[i] % 2; // 当前奇偶性
+            long pre = dp[j];
+            dp[j] = dp[j] + nums[i];
+            dp[j ^ 1] = Math.max(pre - x + nums[i], dp[j ^ 1]);
+        }
+        return dp[nums[0] % 2];
+
+
+    }
+
+//    private long dfs(int i, int j, int x, int[] nums, long[][] cache) {
+//        if (i == nums.length)
+//            return 0;
+//        if (cache[i][j] != -1) return cache[i][j];
+//        if (nums[i] % 2 == j)
+//            return cache[i][j] = dfs(i + 1, j, x, nums, cache) + nums[i];
+//        return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, x, nums, cache) - x + nums[i], dfs(i + 1, j, x, nums, cache));
+//    }
+
+    public long maxAlternatingSum(int[] nums) {
+        /*1911.最大交替子序列和
+         * 一个下标从 0 开始的数组的 交替和 定义为 偶数 下标处元素之 和 减去 奇数 下标处元素之 和 。
+         * 给你一个数组 nums ，请你返回 nums 中任意子序列的 最大交替和 （子序列的下标 重新 从 0 开始编号）。
+         * 枚举每个元素选不选，j 表示当前构造的子序列的下标，如果 j 为偶数，则+反之则减，返回前i个元素的最大子序列的交替和
+         * */
+//        int len = nums.length;
+//        long[][] cache = new long[len][2];
+//        for (long[] longs : cache) {
+//            Arrays.fill(longs, -1);
+//        }
+//        return dfs(0, 0, nums, cache);
+        // 翻译为递推
+//        int len = nums.length;
+//        long[][] dp = new long[len + 1][2];
+//        for (int i = len - 1; i >= 0; i--) {
+//            dp[i][0] = Math.max(dp[i + 1][1] + nums[i], dp[i + 1][0]);
+//            dp[i][1] = Math.max(dp[i + 1][0] - nums[i], dp[i + 1][1]);
+//        }
+//        return dp[0][0];
+
+
+        //空间优化
+        int len = nums.length;
+        int f0 = 0;
+        int f1 = 0;
+        for (int i = len - 1; i >= 0; i--) {
+            int new_f0 = Math.max(f1 + nums[i], f0);
+            f1 = Math.max(f0 - nums[i], f1);
+            f0 = new_f0;
+        }
+        return f0;
+    }
+
+    private long dfs(int i, int j, int[] nums, long[][] cache) {
+        if (i == nums.length)
+            return 0;
+        // 选
+        if (cache[i][j] != -1) return cache[i][j];
+        if (j == 0)
+            return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) + nums[i], dfs(i + 1, j, nums, cache));
+        else return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) - nums[i], dfs(i + 1, j, nums, cache));
+    }
+
 }
 
