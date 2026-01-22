@@ -7,13 +7,16 @@ public class Test {
 //        char[] chars = s.toCharArray();
 //        System.out.println(new String(chars,0,3));
 //        so.longestObstacleCourseAtEachPosition(new int[]{1, 2, 3, 2});
-        int[][] envelopes = {
-                {5, 4},
-                {6, 4},
-                {6, 7},
-                {2, 3}
-        };
-        so.maxEnvelopes(envelopes);
+//        int[][] envelopes = {
+//                {5, 4},
+//                {6, 4},
+//                {6, 7},
+//                {2, 3}
+//        };
+//        so.maxEnvelopes(envelopes);
+        StringBuilder sb = new StringBuilder("bbbab");
+        String reverse = sb.reverse().toString();
+        System.out.println(reverse);
     }
 
 }

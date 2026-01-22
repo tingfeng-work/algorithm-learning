@@ -1318,15 +1318,15 @@ class Solution {
     }
 
     // dfs(i,j) 表示前 i 个字符与前 j 个字符的最短超序列
-    private int dfs(int i, int j) {
-        if (i < 0) return j + 1;
-        if (j < 0) return i + 1;
-        if (cache[i][j] != -1) return cache[i][j];
-
-        if (s[i] == t[j]) return cache[i][j] = dfs(i - 1, j - 1) + 1;
-        else return cache[i][j] = Math.min(dfs(i - 1, j) + 1, dfs(i, j - 1) + 1);
-
-    }
+//    private int dfs(int i, int j) {
+//        if (i < 0) return j + 1;
+//        if (j < 0) return i + 1;
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        if (s[i] == t[j]) return cache[i][j] = dfs(i - 1, j - 1) + 1;
+//        else return cache[i][j] = Math.min(dfs(i - 1, j) + 1, dfs(i, j - 1) + 1);
+//
+//    }
 
     // dfs(i,j) 表示前i字符与前j个字符的最短公共超序列序列的长度
 //    private String dfs(int i, int j, String[][] cache) {
@@ -2083,15 +2083,204 @@ class Solution {
         return f0;
     }
 
-    private long dfs(int i, int j, int[] nums, long[][] cache) {
-        if (i == nums.length)
-            return 0;
-        // 选
-        if (cache[i][j] != -1) return cache[i][j];
-        if (j == 0)
-            return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) + nums[i], dfs(i + 1, j, nums, cache));
-        else return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) - nums[i], dfs(i + 1, j, nums, cache));
+//    private long dfs(int i, int j, int[] nums, long[][] cache) {
+//        if (i == nums.length)
+//            return 0;
+//        // 选
+//        if (cache[i][j] != -1) return cache[i][j];
+//        if (j == 0)
+//            return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) + nums[i], dfs(i + 1, j, nums, cache));
+//        else return cache[i][j] = Math.max(dfs(i + 1, j ^ 1, nums, cache) - nums[i], dfs(i + 1, j, nums, cache));
+//    }
+
+
+    public int longestPalindromeSubseq(String s) {
+        /*516.最长回文子序列
+         * 给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
+         * 思路1：由于回文子序列交换顺序不影响，反转 s 之后与 s 求最长公共子序列，就是最长回文子序列
+         * 思路2：区间DP，枚举一头一尾，如果相等，同时移动，否则只移动一个下标
+         * */
+//        StringBuilder sb = new StringBuilder(s);
+//        String reverse = sb.reverse().toString();
+//        int len = s.length();
+//        int[][] cache = new int[len][len];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(len - 1, len - 1, s.toCharArray(), reverse.toCharArray(), cache);
+        // 思路1 翻译为递推
+//        String reverse = new StringBuilder(s).reverse().toString();
+//        int len = s.length();
+//        int[][] dp = new int[len + 1][len + 1];
+//        for (int i = 0; i < len; i++) {
+//            for (int j = 0; j < len; j++) {
+//                if (s.charAt(i) == reverse.charAt(j)) dp[i + 1][j + 1] = dp[i][j] + 1;
+//                else dp[i + 1][j + 1] = Math.max(dp[i][j + 1], dp[i + 1][j]);
+//            }
+//        }
+//        return dp[len][len];
+
+        // 空间优化
+//        String reverse = new StringBuilder(s).reverse().toString();
+//        int len = s.length();
+//        int[] dp = new int[len + 1];
+//        for (int i = 0; i < len; i++) {
+//            int pre = 0;
+//            for (int j = 0; j < len; j++) {
+//                int temp = dp[j+1];
+//                if (s.charAt(i) == reverse.charAt(j)) dp[j + 1] = pre + 1;
+//                else dp[j + 1] = Math.max(dp[j + 1], dp[j]);
+//                pre = temp;
+//            }
+//        }
+//        return dp[len];
+
+
+//        int len = s.length();
+//        int[][] cache = new int[len][len];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(0, len - 1, s.toCharArray(), cache);
+        // 思路 2 翻译为递推
+//        int len = s.length();
+//        int[][] dp = new int[len][len];
+//        char[] chars = s.toCharArray();
+//
+//        for (int i = len - 1; i >= 0; i--) {
+//            dp[i][i] = 1;
+//            for (int j = i + 1; j < len; j++) {
+//                if (chars[i] == chars[j]) dp[i][j] = dp[i + 1][j-1] + 2;
+//                else dp[i][j] = Math.max(dp[i + 1][j], dp[i][j-1]);
+//            }
+//        }
+//        return dp[0][len-1];
+        // 空间优化：
+        int len = s.length();
+        int[] dp = new int[len];
+        char[] chars = s.toCharArray();
+
+        for (int i = len - 1; i >= 0; i--) {
+            int pre = 0;
+            dp[i] = 1;
+            for (int j = i + 1; j < len; j++) {
+                int temp = dp[j];
+                if (chars[i] == chars[j]) dp[j] = pre + 2;
+                else dp[j] = Math.max(dp[j], dp[j - 1]);
+                pre = temp;
+            }
+        }
+        return dp[len - 1];
+
     }
+
+    // dfs(i,j) 表示在区间 i~j 内的最长回文子序列
+//    private int dfs(int i, int j, char[] charArray, int[][] cache) {
+//        if (i == j)
+//            return 1;
+//        if (i > j) return 0;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        if (charArray[i] == charArray[j])
+//            return cache[i][j] = dfs(i + 1, j - 1, charArray, cache) + 2;
+//        else return cache[i][j] = Math.max(dfs(i + 1, j, charArray, cache), dfs(i, j - 1, charArray, cache));
+//    }
+
+    //dfs(i,j) 表示前i个字符最长公共子序列
+//    private int dfs(int i, int j, char[] s, char[] t, int[][] cache) {
+//        if (i < 0 || j < 0) return 0;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//        if (s[i] == t[j])
+//            return cache[i][j] = dfs(i - 1, j - 1, s, t, cache) + 1;
+//        return cache[i][j] = Math.max(dfs(i - 1, j, s, t, cache), dfs(i, j - 1, s, t, cache));
+//    }
+
+    public int minScoreTriangulation(int[] values) {
+        /*1039.多边形三角剖分的最低得分
+         * 你有一个凸的 n 边形，其每个顶点都有一个整数值。给定一个整数数组 values ，其中 values[i] 是按 顺时针顺序 第 i 个顶点的值。
+         * 假设将多边形 剖分 为 n - 2 个三角形。
+         * 对于每个三角形，该三角形的值是顶点标记的乘积，三角剖分的分数是进行三角剖分后所有 n - 2 个三角形的值之和。
+         * 返回 多边形进行三角剖分后可以得到的最低分 。
+         * 思路：无论怎么分，i、j 为一边都包含在三角形中，考虑以 i、j 两个顶点构成边，枚举区间(i,j)之间的顶点 k，
+         * 然后问题被分为子问题：以 i、k 为边的三角剖分最低得分与以 k、j 为边的三角剖分最低得分
+         *
+         * */
+//        int len = values.length;
+//        int[][] cache = new int[len][len];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(0, len - 1, values, cache);
+        // 翻译为递推
+        int len = values.length;
+        int[][] dp = new int[len][len];
+
+        for (int i = len - 1; i >= 0; i--) {
+            for (int j = 0; j < len; j++) {
+                dp[i][j] = Integer.MAX_VALUE;
+                if (i + 1 == j) dp[i][j] = 0;
+                for (int k = i + 1; k < j; k++) {
+                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k][j] + values[i] * values[j] * values[k]);
+                }
+            }
+        }
+        return dp[0][len - 1];
+    }
+
+    // 返回以 i、j 为底边的三角剖分最低得分
+//    private int dfs(int i, int j, int[] values, int[][] cache) {
+//        if (i + 1 == j) return 0; // 表示区间内只有两顶点，构不成三角形
+//        if (cache[i][j] != -1) return cache[i][j];
+//        int res = Integer.MAX_VALUE;
+//        for (int k = i + 1; k < j; k++) {
+//            res = Math.min(res,
+//                    dfs(i, k, values, cache) + dfs(k, j, values, cache) + values[i] * values[j] * values[k]);
+//        }
+//        return cache[i][j] = res;
+//    }
+
+    public int getMoneyAmount(int n) {
+        /*375.猜数字大小而
+         * 猜错需要支付对应的金额
+         * 求能够确保获胜的最小金额数，无论选哪个数字
+         * 思路：枚举选哪个题型，每次选择一个数，假设都没有猜中，直到区间长度为1时，必中，所求的就是这个枚举过程的最小值
+         * 当前操作，猜一个数，将当前区间分为[i,j] 分为[i,k-1],k,[k+1,j]，当前问题就转化为了 k + dfs(i,k-1) + dfs(k+1,j)
+         * 对于每个区间内，求的是花费最大值，也就是假设没有猜中
+         * */
+//        int[][] cache = new int[n + 1][n + 1];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(1, n, cache);
+        // 翻译为递推
+        int[][] dp = new int[n + 1][n + 1];
+        for (int i = n; i > 0; i--) {
+            for (int j = i + 1; j <= n; j++) {
+                dp[i][j] = Integer.MAX_VALUE / 2;
+                if (i + 1 == j) dp[i][j] = i;
+                for (int k = i + 1; k < j; k++) {
+                    dp[i][j] = Math.min(dp[i][j], Math.max(dp[i][k - 1], dp[k + 1][j]) + k);
+                }
+            }
+        }
+        return dp[1][n];
+    }
+
+    // 表示区间 [i,j] 内获胜的最小金额
+//    private int dfs(int i, int j, int[][] cache) {
+//        if (i + 1 == j) return i; // 猜小的，得到的花费最小
+//        if (i == j) return 0; // 不用猜，必中
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        int res = Integer.MAX_VALUE;
+//        for (int k = i + 1; k < j; k++) {
+//            res = Math.min(res, Math.max(dfs(i, k - 1, cache), dfs(k + 1, j, cache)) + k);
+//        }
+//        return cache[i][j] = res;
+//    }
 
 }
 
