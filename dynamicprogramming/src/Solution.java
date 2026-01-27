@@ -1,3 +1,4 @@
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1254,68 +1255,69 @@ class Solution {
 //    }
 
     private char[] s, t;
-    private int[][] cache;
+//    private int[][] cache;
 
-    public String shortestCommonSupersequence(String str1, String str2) {
-        /*1092. 最短公共超序列
-         * 给你两个字符串 str1 和 str2，返回同时以 str1 和 str2 作为 子序列 的最短字符串。
-         * 如果答案不止一个，则可以返回满足条件的 任意一个 答案。
-         * 也就是要生成一个最短字符串，满足 str1与str2都是它的子序列
-         *
-         * */
+//    public String shortestCommonSupersequence(String str1, String str2) {
+//        /*1092. 最短公共超序列
+//         * 给你两个字符串 str1 和 str2，返回同时以 str1 和 str2 作为 子序列 的最短字符串。
+//         * 如果答案不止一个，则可以返回满足条件的 任意一个 答案。
+//         * 也就是要生成一个最短字符串，满足 str1与str2都是它的子序列
+//         *
+//         * */
+////        s = str1.toCharArray();
+////        t = str2.toCharArray();
+////        int n = s.length;
+////        int m = t.length;
+////        String[][] cache = new String[n][m];
+////
+////        return dfs(n - 1, m - 1, cache);
+//        // 翻译为递推
+//
+
+    /// /        char[] s = str1.toCharArray();
+    /// /        char[] t = str2.toCharArray();
+    /// /        int m = t.length;
+    /// /        String[] dp = new String[m+1];
+    /// /        dp[0] = "";
+    /// /        for (int i = 0; i < m; i++) {
+    /// /            dp[i+1] = dp[i] + t[i];
+    /// /        }
+    /// /
+    /// /        for (char c : s) {
+    /// /            String pre = dp[0];
+    /// /            dp[0] = dp[0] + c;
+    /// /            for (int j = 0; j < m; j++) {
+    /// /                String temp = dp[j+1];
+    /// /                dp[j+1] = c == t[j] ? pre + c :
+    /// /                        dp[j+1].length() < dp[j].length() ? dp[j+1] + c : dp[j] + t[j];
+    /// /                pre = temp;
+    /// /            }
+    /// /        }
+    /// /        return dp[m];
+//
+//        // 递归长度与构造答案分开
 //        s = str1.toCharArray();
 //        t = str2.toCharArray();
 //        int n = s.length;
 //        int m = t.length;
-//        String[][] cache = new String[n][m];
-//
-//        return dfs(n - 1, m - 1, cache);
-        // 翻译为递推
-
-//        char[] s = str1.toCharArray();
-//        char[] t = str2.toCharArray();
-//        int m = t.length;
-//        String[] dp = new String[m + 1];
-//        dp[0] = "";
-//        for (int i = 0; i < m; i++) {
-//            dp[i + 1] = dp[i] + t[i];
+//        cache = new int[n][m];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
 //        }
+//        return makeAns(n - 1, m - 1);
 //
-//        for (char c : s) {
-//            String pre = dp[0];
-//            dp[0] = dp[0] + c;
-//            for (int j = 0; j < m; j++) {
-//                String temp = dp[j + 1];
-//                dp[j + 1] = c == t[j] ? pre + c :
-//                        dp[j + 1].length() < dp[j].length() ? dp[j + 1] + c : dp[j] + t[j];
-//                pre = temp;
-//            }
+//
+//    }
+
+//    private String makeAns(int i, int j) {
+//        if (i < 0) return new String(t, 0, j + 1);
+//        if (j < 0) return new String(s, 0, i + 1);
+//        if (s[i] == t[j]) {
+//            return makeAns(i - 1, j - 1) + s[i];
 //        }
-//        return dp[m];
-
-        // 递归长度与构造答案分开
-        s = str1.toCharArray();
-        t = str2.toCharArray();
-        int n = s.length;
-        int m = t.length;
-        cache = new int[n][m];
-        for (int[] ints : cache) {
-            Arrays.fill(ints, -1);
-        }
-        return makeAns(n - 1, m - 1);
-
-
-    }
-
-    private String makeAns(int i, int j) {
-        if (i < 0) return new String(t, 0, j + 1);
-        if (j < 0) return new String(s, 0, i + 1);
-        if (s[i] == t[j]) {
-            return makeAns(i - 1, j - 1) + s[i];
-        }
-        if (dfs(i, j) == dfs(i - 1, j) + 1) return makeAns(i - 1, j) + s[i];
-        else return makeAns(i, j - 1) + t[j];
-    }
+//        if (dfs(i, j) == dfs(i - 1, j) + 1) return makeAns(i - 1, j) + s[i];
+//        else return makeAns(i, j - 1) + t[j];
+//    }
 
     // dfs(i,j) 表示前 i 个字符与前 j 个字符的最短超序列
 //    private int dfs(int i, int j) {
@@ -1345,7 +1347,6 @@ class Solution {
 //        String str2 = dfs(i, j - 1, cache) + t[j];
 //        return cache[i][j] = str1.length() > str2.length() ? str2 : str1;
 //    }
-
     public int lengthOfLIS(int[] nums) {
         /*300.最长递增子序列
          * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
@@ -2280,6 +2281,202 @@ class Solution {
 //            res = Math.min(res, Math.max(dfs(i, k - 1, cache), dfs(k + 1, j, cache)) + k);
 //        }
 //        return cache[i][j] = res;
+//    }
+
+    public int minInsertions(String s) {
+        /*1312.让字符串成为回文串的最少插入次数
+         * 给你一个字符串 s ，每一次操作你都可以在字符串的任意位置插入任意字符。
+         * 请你返回让 s 成为回文串的 最少操作次数 。
+         * 思路：枚举左右端点，如果相等则移动左右端点，不相等，分别移动左端点、右端点
+         * dfs(i,j) 返回值表示在区间[i,j]内让字符串成为回文串的最少插入次数
+         * */
+//        char[] chars = s.toCharArray();
+//        int len = chars.length;
+//        int[][] cache = new int[len][len];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        return dfs(0, len - 1, chars, cache);
+        //翻译为递推
+//        char[] chars = s.toCharArray();
+//        int len = chars.length;
+//        int[][] dp = new int[len][len];
+//        for (int i = len - 1; i >= 0; i--) {
+//            for (int j = i + 1; j < len; j++) {
+//                if (chars[i] == chars[j]) dp[i][j] = dp[i + 1][j - 1];
+//                else dp[i][j] = Math.min(dp[i + 1][j], dp[i][j - 1]) + 1;
+//            }
+//        }
+//        return dp[0][len - 1];
+        // 空间优化
+        char[] chars = s.toCharArray();
+        int len = chars.length;
+        int[] dp = new int[len];
+        for (int i = len - 1; i >= 0; i--) {
+            int pre = 0;
+            for (int j = i + 1; j < len; j++) {
+                int temp = dp[j];
+                if (chars[i] == chars[j]) dp[j] = pre;
+                else dp[j] = Math.min(dp[j], dp[j - 1]) + 1;
+                pre = temp;
+            }
+        }
+        return dp[len - 1];
+    }
+
+    // dfs(i,j) 返回值表示在区间[i,j]内让字符串成为回文串的最少插入次数
+//    private int dfs(int i, int j, char[] chars, int[][] cache) {
+//        if (i >= j) return 0;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        if (chars[i] == chars[j])
+//            return cache[i][j] = dfs(i + 1, j - 1, chars, cache);
+//        else {
+//            return cache[i][j] = Math.min(dfs(i + 1, j, chars, cache), dfs(i, j - 1, chars, cache)) + 1;
+//        }
+//
+//    }
+    public int longestPalindromicSubsequence(String S, int K) {
+        /*3472.至多 K 次操作后的最长回文子序列
+         * 给你一个字符串 s 和一个整数 k。
+         * 在一次操作中，你可以将任意位置的字符替换为字母表中相邻的字符
+         * （字母表是循环的，因此 'z' 的下一个字母是 'a'）。
+         * 返回在进行 最多 k 次操作后，s 的 最长回文子序列 的长度。
+         * dfs(i,j,k) 表示在区间[i,j]上，还剩 k 次操作数的最长回文子序列长度
+         * */
+//        char[] chars = s.toCharArray();
+//        int len = chars.length;
+//        int[][][] cache = new int[len][len][k + 1];
+//        for (int[][] ints : cache) {
+//            for (int[] anInt : ints) {
+//                Arrays.fill(anInt, -1);
+//            }
+//        }
+//        return dfs(0, len - 1, chars, k, cache);
+        // 翻译为递推
+        char[] s = S.toCharArray();
+        int n = s.length;
+        int cnt = 0;
+        // 如果 s 可以在 k 次操作内变成回文串，那么直接返回 n。
+        for (int i = 0; i < n / 2; i++) {
+            int d = Math.abs(s[i] - s[n - 1 - i]);
+            cnt += Math.min(d, 26 - d);
+        }
+        if (cnt <= K) {
+            return n;
+        }
+
+        int[][][] f = new int[K + 1][n][n];
+        for (int k = 0; k <= K; k++) {
+            for (int i = n - 1; i >= 0; i--) {
+                f[k][i][i] = 1;
+                for (int j = i + 1; j < n; j++) {
+                    int res = Math.max(f[k][i + 1][j], f[k][i][j - 1]);
+                    int d = Math.abs(s[i] - s[j]);
+                    int op = Math.min(d, 26 - d);
+                    if (op <= k) {
+                        res = Math.max(res, f[k - op][i + 1][j - 1] + 2);
+                    }
+                    f[k][i][j] = res;
+                }
+            }
+        }
+        return f[K][0][n - 1];
+
+    }
+
+    //    private int dfs(int i, int j, char[] chars, int k, int[][][] cache) {
+//        if (i > j) return 0;
+//        if (i == j) return 1;
+//
+//        if (cache[i][j][k] != -1) return cache[i][j][k];
+//
+//        if (chars[i] == chars[j])
+//            return cache[i][j][k] = dfs(i + 1, j - 1, chars, k, cache) + 2;
+//        else {
+//            int op = Math.abs(chars[i] - chars[j]);
+//            op = Math.min(op, 26 - op);
+//            if (k >= op) {
+//                return cache[i][j][k] = Math.max(
+//                        Math.max(dfs(i + 1, j, chars, k, cache), dfs(i, j - 1, chars, k, cache)),
+//                        dfs(i + 1, j - 1, chars, k - op, cache) + 2);
+//            } else
+//                return cache[i][j][k] = Math.max(dfs(i + 1, j, chars, k, cache), dfs(i, j - 1, chars, k, cache));
+//        }
+//
+//    }
+//    private int[] nums;
+//    private int[][] cache;
+
+    public int maxOperations(int[] nums) {
+        /*3040.相同分数的最大操作数目
+        *给你一个整数数组 nums ，如果 nums 至少 包含 2 个元素，你可以执行以下操作中的 任意 一个
+        * 选择 nums 中最前面两个元素并且删除它们。
+        选择 nums 中最后两个元素并且删除它们。
+        选择 nums 中第一个和最后一个元素并且删除它们。
+        * 一次操作的 分数 是被删除元素的和。
+        在确保 所有操作分数相同 的前提下，请你求出 最多 能进行多少次操作。
+        * 请你返回按照上述要求 最多 可以进行的操作次数。
+        * 思路：枚举区间[i,j]中的数满足相同分数的最大操作数目，
+        * 当前操作有删除前面两个数，删除后面两个数，删除一前一后，维护当前操作的分数
+        * */
+//        this.nums = nums;
+//        int ans = 0;
+//        int len = nums.length;
+//        cache = new int[len][len];
+//        for (int[] ints : cache) {
+//            Arrays.fill(ints, -1);
+//        }
+//        ans = Math.max(ans, dfs(2, len - 1, nums[0] + nums[1]));
+//        ans = Math.max(ans, dfs(1, len - 2, nums[0] + nums[len - 1]));
+//        ans = Math.max(ans, dfs(0, len - 3, nums[len - 1] + nums[len - 2]));
+//        return ans+1;
+        // 翻译为递推
+        int len = nums.length;
+        int res1 = f(2, len - 1, nums[0] + nums[1], nums);
+        int res2 = f(1, len - 2, nums[0] + nums[len - 1], nums);
+        int res3 = f(0, len - 3, nums[len - 1] + nums[len - 2], nums);
+        return Math.max(Math.max(res1, res2), res3) + 1;
+    }
+
+    private int f(int start, int end, int target, int[] nums) {
+        int n = nums.length;
+        int[][] f = new int[n + 1][n + 1];
+        for (int i = end - 1; i >= start; i--) {
+            for (int j = i + 1; j <= end; j++) {
+                if (nums[i] + nums[i + 1] == target) { // 删除前两个数
+                    f[i][j + 1] = Math.max(f[i][j + 1], f[i + 2][j + 1] + 1);
+                }
+                if (nums[j - 1] + nums[j] == target) { // 删除后两个数
+                    f[i][j + 1] = Math.max(f[i][j + 1], f[i][j - 1] + 1);
+                }
+                if (nums[i] + nums[j] == target) { // 删除第一个和最后一个数
+                    f[i][j + 1] = Math.max(f[i][j + 1], f[i + 1][j] + 1);
+                }
+            }
+        }
+        return f[start][end + 1];
+    }
+
+    // dfs(i,j) 表示区间[i,j] 内相同分数的最大操作数目
+//    private int dfs(int i, int j, int target) {
+//        if (i + 1 > j) return 0;
+//
+//        if (cache[i][j] != -1) return cache[i][j];
+//
+//        int res = 0;
+//        if (nums[i] + nums[i + 1] == target) {
+//            res = Math.max(res, dfs(i + 2, j, target) + 1);
+//        }
+//        if (nums[i] + nums[j] == target) {
+//            res = Math.max(dfs(i + 1, j - 1, target) + 1, res);
+//        }
+//        if (nums[j] + nums[j - 1] == target) {
+//            res = Math.max(dfs(i, j - 2, target) + 1, res);
+//        }
+//        return cache[i][j] = res;
+//
 //    }
 
 }

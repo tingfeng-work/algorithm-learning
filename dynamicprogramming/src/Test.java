@@ -14,9 +14,7 @@ public class Test {
 //                {2, 3}
 //        };
 //        so.maxEnvelopes(envelopes);
-        StringBuilder sb = new StringBuilder("bbbab");
-        String reverse = sb.reverse().toString();
-        System.out.println(reverse);
+        System.out.println(so.minInsertions("zjveiiwvc"));
     }
 
 }
