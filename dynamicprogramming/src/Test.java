@@ -1,6 +1,6 @@
 public class Test {
     public static void main(String[] args) {
-        Solution so = new Solution();
+
 //        System.out.println(so.shortestCommonSupersequence("bbbaaaba", "bbababbb"));
 //        System.out.println("bbbaaababbb".length());
 //        String s = "01234";
@@ -14,7 +14,7 @@ public class Test {
 //                {2, 3}
 //        };
 //        so.maxEnvelopes(envelopes);
-        System.out.println(so.minInsertions("zjveiiwvc"));
+        System.out.println(Math.pow(2,3));
     }
 
 }
