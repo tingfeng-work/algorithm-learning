@@ -159,12 +159,12 @@ f[k][i][j]
 
 [
 f[k][i][j]
-==========
+==
 
-\min\left(
+min(
 f[k-1][i][j],
 f[k-1][i][k]+f[k-1][k][j]
-\right)
+)
 ]
 
 空间压缩后使用二维数组：
@@ -241,7 +241,7 @@ while (st == null || !st.hasMoreTokens())
 假设总预算为 `budget`，各素材价格为 `price[i]`，则新的目标金额为：
 
 [
-target=budget-\sum price[i]
+target=budget-sum(price[i])
 ]
 
 完成这一步之后，问题就转化为：
